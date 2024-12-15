@@ -1,7 +1,6 @@
 import React, { useContext } from "react";
 import "./MenuItemBox.css";
 import { VenueContext } from "../../context/VenueContext.jsx";
-import { Venue } from "../../../../backend/src/models/venue.model";
 import { useNavigate, useParams } from "react-router-dom";
 import { CartContext } from "../../context/CartContext.jsx";
 const MenuItemBox = ({ item }) => {
