@@ -1,0 +1,6 @@
+.main-div::-webkit-scrollbar{
+    display: none;
+}
+.bottom-sheet-div::-webkit-scrollbar{
+    display: none;
+}
