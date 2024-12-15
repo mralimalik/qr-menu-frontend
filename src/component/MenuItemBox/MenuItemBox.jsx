@@ -11,7 +11,7 @@ const MenuItemBox = ({ item }) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/${venueId}/menu/${menuId}/item/${item._id}`); // Navigate to the item detail page
+    navigate(`/${venueId}/menu/${menuId}/item/${item._id}`);
   };
 
 

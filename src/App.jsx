@@ -10,18 +10,27 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route
+          path="/"
+          element={
+            <div className="h-screen w-full flex justify-center items-center">
+              Nothing Found
+            </div>
+          }
+        />
+
         {/* Define a route with a dynamic parameter */}
-        <Route path="/:venueId" element={<VenueLayout />} >
+        <Route path="/:venueId" element={<VenueLayout />}>
           {/* Nested routes */}
           <Route path="" element={<Home />} /> {/* Default nested route */}
           <Route path="menu/:menuId" element={<MenuHome />} />
           <Route path="menu/:menuId/cart" element={<Cart />} />
           <Route path="menu/:menuId/checkout" element={<Checkout />} />
-
-          <Route path="menu/:menuId/order-summary/:orderId" element={<OrderSummary />} />
-
+          <Route
+            path="menu/:menuId/order-summary/:orderId"
+            element={<OrderSummary />}
+          />
           <Route path="menu/:menuId/item/:itemId" element={<ItemDetail />} />
-
         </Route>
       </Routes>
     </Router>
