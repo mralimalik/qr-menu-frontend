@@ -2,6 +2,7 @@ import { useState, useEffect, createContext, useRef, useContext } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
 import { MenuContext } from "./MenuContext.jsx";
+import { apiurl } from "../constants/apiconst.js";
 export const VenueContext = createContext();
 
 export const VenueContextProvider = ({ children }) => {
@@ -30,7 +31,7 @@ export const VenueContextProvider = ({ children }) => {
   const fetchVenueData = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/venue/qr/${venueId}`
+        `${apiurl}venue/qr/${venueId}`
       );
       if (response.status === 200) {
         setVenueData(response.data.venue);
@@ -52,7 +53,7 @@ export const VenueContextProvider = ({ children }) => {
   // get order settings for that venue
   const getOrderSettings = async (venueId) => {
     try {
-      const url = `http://localhost:3000/order/settings/${venueId}`;
+      const url = `${apiurl}order/settings/${venueId}`;
       const response = await axios.get(url);
 
       if (response.status === 200) {
@@ -69,7 +70,7 @@ export const VenueContextProvider = ({ children }) => {
   const getSelectedMenuData = async (venueId, menuId) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/menu/qr/${venueId}/${menuId}`
+        `${apiurl}menu/qr/${venueId}/${menuId}`
       );
 
       // Handle the response after successfully creating a venue
@@ -85,7 +86,7 @@ export const VenueContextProvider = ({ children }) => {
   const fetchTableData = async (tableId) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/table/${venueId}/table/${tableId}`
+        `${apiurl}table/${venueId}/table/${tableId}`
       );
       if (response.status === 200) {
         setTableData(response.data.data);

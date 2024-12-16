@@ -6,6 +6,7 @@ import ItemDetail from "./pages/ItemDetailPage/ItemDetail.jsx";
 import Cart from "./pages/CartPage/Cart.jsx";
 import Checkout from "./pages/Checkout/Checkout.jsx";
 import OrderSummary from "./pages/OrderSummary/OrderSummary.jsx";
+import OrderStatus from "./pages/OrderStatus/OrderStatus.jsx";
 function App() {
   return (
     <Router>
@@ -21,6 +22,10 @@ function App() {
 
         {/* Define a route with a dynamic parameter */}
         <Route path="/:venueId" element={<VenueLayout />}>
+          <Route
+            path="/:venueId/order-status/:orderId"
+            element={<OrderStatus />}
+          />
           {/* Nested routes */}
           <Route path="" element={<Home />} /> {/* Default nested route */}
           <Route path="menu/:menuId" element={<MenuHome />} />
@@ -31,6 +36,8 @@ function App() {
             element={<OrderSummary />}
           />
           <Route path="menu/:menuId/item/:itemId" element={<ItemDetail />} />
+          <Route path="order-status" element={<OrderStatus />} />
+          <Route path="order-status/:orderId" element={<OrderStatus />} />
         </Route>
       </Routes>
     </Router>

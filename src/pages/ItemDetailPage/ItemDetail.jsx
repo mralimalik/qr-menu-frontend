@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { CartContext } from "../../context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
+import { apiurl } from "../../constants/apiconst.js";
 import "react-toastify/dist/ReactToastify.css";
 
 const ItemDetail = ({}) => {
@@ -50,7 +51,7 @@ const ItemDetail = ({}) => {
   const fetchModifiers = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/modifier/${itemId}`
+        `${apiurl}modifier/${itemId}`
       );
 
       // Only set modifiers if status code is 200

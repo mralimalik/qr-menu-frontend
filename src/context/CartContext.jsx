@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { apiurl } from "../constants/apiconst.js";
 export const CartContext = createContext();
 
 export const CartContextProvider = ({ children }) => {
@@ -197,7 +198,7 @@ export const CartContextProvider = ({ children }) => {
         customerInfo
       );
 
-      const url = `http://localhost:3000/order/createOrder/${venue}`;
+      const url = `${apiurl}order/createOrder/${venue}`;
 
       const response = await axios.post(url, orderData);
 
@@ -225,7 +226,7 @@ export const CartContextProvider = ({ children }) => {
   const getOrder = async (orderId) => {
     try {
     
-      const url = `http://localhost:3000/order/${orderId}`;
+      const url = `${apiurl}order/${orderId}`;
 
       const response = await axios.get(url);
 

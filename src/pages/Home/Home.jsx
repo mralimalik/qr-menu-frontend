@@ -12,7 +12,7 @@ const Home = () => {
     tableData,
     orderSettings,
     orderType,
-    storeOrderTypeInLocal
+    storeOrderTypeInLocal,
   } = useContext(VenueContext);
 
   const [isMenuDialogOpen, setIsMenuDialogOpen] = useState(false);
@@ -51,9 +51,12 @@ const Home = () => {
 
   const shouldShowDeliveryButton =
     orderSettings?.settings?.delivery?.orderEnabled;
-
-  // const shouldShowPickupButton =
-  //   orderSettings?.settings?.pickup?.orderEnabled;
+  const orderStatusNavigation = () => {
+    
+      navigate(`/${venueData.venueId}/order-status`);
+     
+    
+  };
 
   return (
     <div className="h-screen w-full flex flex-col relative">
@@ -72,9 +75,8 @@ const Home = () => {
           </h1>
 
           {orderType === "table" && (
-            <MenuButton handleMenu={()=>handleMenuSelection("table")} />
+            <MenuButton handleMenu={() => handleMenuSelection("table")} />
           )}
-
 
           {orderType !== "table" && (
             <>
@@ -84,14 +86,16 @@ const Home = () => {
               {shouldShowPickupButton && (
                 <MenuButton buttonText="Pick up" handleMenu={()=>handleMenuSelection("pickup")}/>
               )} */}
-               
-                <MenuButton buttonText="Go to Menu" handleMenu={()=>handleMenuSelection(null)} />
-              
+
+              <MenuButton
+                buttonText="Go to Menu"
+                handleMenu={() => handleMenuSelection(null)}
+              />
             </>
           )}
         </div>
-        <div className="border-y-2 py-4 px-2">
-          <p>📄 Give Feedback</p>
+        <div className="border-y-2 py-4 px-2" onClick={orderStatusNavigation}>
+          <p>📄 Order Status</p>
         </div>
       </div>
       {isMenuDialogOpen && (
