@@ -17,14 +17,14 @@ export const VenueContextProvider = ({ children }) => {
   // to store menus data
   const [menus, setMenus] = useState(null);
   // to store tax,discount charges
-  const [charges,setCharges] = useState(null);
+  const [charges, setCharges] = useState(null);
 
   // to select selected menu data
   const [selectedMenu, setSelectedMenu] = useState(null);
   // to set order settings
   const [orderSettings, setOrderSettings] = useState(null);
 
-  const [orderType,setOrderType] = useState(null);
+  const [orderType, setOrderType] = useState(null);
 
   //to fetch venue data
   const fetchVenueData = async () => {
@@ -35,12 +35,12 @@ export const VenueContextProvider = ({ children }) => {
       if (response.status === 200) {
         setVenueData(response.data.venue);
         setMenus(response.data.menus);
-        setCharges(response.data.venueCharges)
+        setCharges(response.data.venueCharges);
         await getOrderSettings(response.data.venue._id);
         console.log(response.data);
-        
-        localStorage.setItem("venue",venueId);
-            }
+
+        localStorage.setItem("venue", venueId);
+      }
     } catch (err) {
       console.error(
         "Error fetching venue data:",
@@ -66,19 +66,21 @@ export const VenueContextProvider = ({ children }) => {
   };
 
   // to get data of selected menu
-  const getSelectedMenuData = async (venueId,menuId) => {
+  const getSelectedMenuData = async (venueId, menuId) => {
     try {
-      const response = await axios.get(`http://localhost:3000/menu/qr/${venueId}/${menuId}`);
+      const response = await axios.get(
+        `http://localhost:3000/menu/qr/${venueId}/${menuId}`
+      );
 
       // Handle the response after successfully creating a venue
       if (response.data) {
         setSelectedMenu(response.data.data);
       }
-
     } catch (err) {
       console.log("Error getting menu with no item:", err);
     }
   };
+
   // to fetch table data if there table id in parms
   const fetchTableData = async (tableId) => {
     try {
@@ -88,9 +90,10 @@ export const VenueContextProvider = ({ children }) => {
       if (response.status === 200) {
         setTableData(response.data.data);
         console.log(response.data.data);
-      }
+      } 
     } catch (err) {
-      localStorage.removeItem("tableId")
+      localStorage.removeItem("tableId");
+      storeOrderTypeInLocal(null); // Remove the order type if table is not found
 
       console.error(
         "Error fetching table data:",
@@ -107,21 +110,20 @@ export const VenueContextProvider = ({ children }) => {
       storeTableIdInLocal(table);
     } else {
       // localStorage.removeItem("tableId")
-    } 
+    }
   };
 
   // then storing table id in local storage
   const storeTableIdInLocal = (tableId) => {
     localStorage.setItem("tableId", tableId);
     storeOrderTypeInLocal("table");
-   
   };
 
   // to store order type in local
   const storeOrderTypeInLocal = (orderType) => {
-    localStorage.setItem("orderType",orderType);
+    localStorage.setItem("orderType", orderType);
     setOrderType(orderType);
-  }
+  };
 
   // getting table id from local if avialable
   const getTableIdFromLocal = () => {
@@ -130,13 +132,13 @@ export const VenueContextProvider = ({ children }) => {
       fetchTableData(tableId);
     }
   };
-    // getting table type from local if avialable
-    const getOrderTypeFromLocal = () => {
-      const orderType = localStorage.getItem("orderType");
-      if (orderType) {
-        setOrderType(orderType);
-      }
-    };
+  // getting table type from local if avialable
+  const getOrderTypeFromLocal = () => {
+    const orderType = localStorage.getItem("orderType");
+    if (orderType) {
+      setOrderType(orderType);
+    }
+  };
 
   useEffect(() => {
     console.log("run first");
@@ -151,15 +153,13 @@ export const VenueContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-   const venue = localStorage.getItem("venue");
-    if(venue!==venueId){
+    const venue = localStorage.getItem("venue");
+    if (venue !== venueId) {
       // remove the old venue data and cart items
       localStorage.removeItem("venue");
       localStorage.removeItem("cartItems");
     }
-
-  }, [])
-  
+  }, []);
 
   return (
     <VenueContext.Provider
@@ -175,7 +175,7 @@ export const VenueContextProvider = ({ children }) => {
         getSelectedMenuData,
         orderType,
         storeOrderTypeInLocal,
-        charges
+        charges,
       }}
     >
       {children}

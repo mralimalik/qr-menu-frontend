@@ -231,14 +231,24 @@ const ItemDetail = ({}) => {
     <div className="bg-white flex justify-start ">
       <div className="main-div h-screen w-[410px]  overflow-y-auto  relative overflow-hidden">
         {/* {image div} */}
-        <div className="w-[410px]  object-cover h-full bg-slate-400 fixed ">
-          Image
+        <div className="w-[410px] object-cover h-[300px] bg-slate-400 fixed">
+          {/* Check if itemData.image exists, and render the image */}
+          {itemData?.image ? (
+            <img
+              src={itemData.image}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <p className="flex justify-center items-center h-[180px]">
+              No image available
+            </p>
+          )}
         </div>
-
         {/* {bottom sheet div} */}
         <div
           className="bottom-sheet-div border-r h-full w-full bg-white rounded-t-[30px] 
-        rounded-tr-[30px] absolute z-50 -bottom-44 px-4 py-4 flex flex-col gap-3 overflow-y-auto"
+        rounded-tr-[30px] absolute z-50 -bottom-48 px-4 py-4 flex flex-col gap-3 overflow-y-auto"
         >
           <h3 className="font-medium text-xl text-slate-600">
             {itemData?.itemName}
@@ -269,95 +279,97 @@ const ItemDetail = ({}) => {
           })}
 
           {/* {Item modifier list to add aditional item in item} */}
-          <div className="mt-3 mb-8">
-            {modifiers?.map((modifierGroup, index) => {
-              return (
-                <div key={index}>
-                  {/* {Modifer group} */}
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-1">
-                      <h3 className="font-medium text-lg text-slate-600">
-                        {modifierGroup.groupName}
-                      </h3>
-                      <h3 className="font-normal text-md text-slate-400">
-                        (Max {modifierGroup.max})
-                      </h3>
+          {modifiers && modifiers.length > 0 && (
+            <div className="mt-3 mb-8">
+              {modifiers?.map((modifierGroup, index) => {
+                return (
+                  <div key={index}>
+                    {/* {Modifer group} */}
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1">
+                        <h3 className="font-medium text-lg text-slate-600">
+                          {modifierGroup.groupName}
+                        </h3>
+                        <h3 className="font-normal text-md text-slate-400">
+                          (Max {modifierGroup.max})
+                        </h3>
+                      </div>
+                      <div className="flex justify-center items-center px-3  py-1 bg-gray-500 rounded-full ">
+                        <p className="text-xs text-white ">Optional</p>
+                      </div>
                     </div>
-                    <div className="flex justify-center items-center px-3  py-1 bg-gray-500 rounded-full ">
-                      <p className="text-xs text-white ">Optional</p>
-                    </div>
-                  </div>
 
-                  {/* {Modifer items} */}
-                  {modifierGroup.modifierPrices.map((price, index) => {
-                    const modifierItem = modifierQuantity.find(
-                      (item) =>
-                        item.modifierPriceId === price._id &&
-                        item.modifierId === modifierGroup.modifierId
-                    );
-                    const modifierQuantityValue = modifierItem
-                      ? modifierItem.quantity
-                      : 0;
+                    {/* {Modifer items} */}
+                    {modifierGroup?.modifierPrices?.map((price, index) => {
+                      const modifierItem = modifierQuantity.find(
+                        (item) =>
+                          item.modifierPriceId === price._id &&
+                          item.modifierId === modifierGroup.modifierId
+                      );
+                      const modifierQuantityValue = modifierItem
+                        ? modifierItem.quantity
+                        : 0;
 
-                    return (
-                      <div key={index}>
-                        <div className="flex justify-between items-center my-2">
-                          <div>
-                            <h3 className="font-normal text-base text-slate-600">
-                              {price.name} ({price.calories} Cal)
-                            </h3>
-                            <h3 className="font-medium text-base text-red-500">
-                              $ {price.price}
-                            </h3>
-                          </div>
-
-                          <div className="flex gap-2 items-center justify-center">
-                            <div
-                              className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center"
-                              onClick={() => {
-                                addModifiers(
-                                  modifierGroup.modifierId,
-                                  price._id,
-                                  price.price,
-                                  modifierGroup.min,
-                                  modifierGroup.max,
-                                  false,
-                                  modifierGroup.groupName,
-                                  price.name
-                                );
-                              }}
-                            >
-                              <p>-</p>
+                      return (
+                        <div key={index}>
+                          <div className="flex justify-between items-center my-2">
+                            <div>
+                              <h3 className="font-normal text-base text-slate-600">
+                                {price.name} ({price.calories} Cal)
+                              </h3>
+                              <h3 className="font-medium text-base text-red-500">
+                                $ {price.price}
+                              </h3>
                             </div>
 
-                            <p className="text-xl">{modifierQuantityValue}</p>
+                            <div className="flex gap-2 items-center justify-center">
+                              <div
+                                className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center"
+                                onClick={() => {
+                                  addModifiers(
+                                    modifierGroup.modifierId,
+                                    price._id,
+                                    price.price,
+                                    modifierGroup.min,
+                                    modifierGroup.max,
+                                    false,
+                                    modifierGroup.groupName,
+                                    price.name
+                                  );
+                                }}
+                              >
+                                <p>-</p>
+                              </div>
 
-                            <div
-                              className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center"
-                              onClick={() => {
-                                addModifiers(
-                                  modifierGroup.modifierId,
-                                  price._id,
-                                  price.price,
-                                  modifierGroup.min,
-                                  modifierGroup.max,
-                                  true,
-                                  modifierGroup.groupName,
-                                  price.name
-                                );
-                              }}
-                            >
-                              <p>+</p>
+                              <p className="text-xl">{modifierQuantityValue}</p>
+
+                              <div
+                                className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center"
+                                onClick={() => {
+                                  addModifiers(
+                                    modifierGroup.modifierId,
+                                    price._id,
+                                    price.price,
+                                    modifierGroup.min,
+                                    modifierGroup.max,
+                                    true,
+                                    modifierGroup.groupName,
+                                    price.name
+                                  );
+                                }}
+                              >
+                                <p>+</p>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </div>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {/* add to cart button */}
           {isCartButtonVisible() && (

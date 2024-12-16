@@ -52,8 +52,8 @@ const Home = () => {
   const shouldShowDeliveryButton =
     orderSettings?.settings?.delivery?.orderEnabled;
 
-  const shouldShowPickupButton =
-    orderSettings?.settings?.pickup?.orderEnabled;
+  // const shouldShowPickupButton =
+  //   orderSettings?.settings?.pickup?.orderEnabled;
 
   return (
     <div className="h-screen w-full flex flex-col relative">
@@ -84,9 +84,9 @@ const Home = () => {
               {shouldShowPickupButton && (
                 <MenuButton buttonText="Pick up" handleMenu={()=>handleMenuSelection("pickup")}/>
               )} */}
-              {!shouldShowDeliveryButton && !shouldShowPickupButton && (
+               
                 <MenuButton buttonText="Go to Menu" handleMenu={()=>handleMenuSelection(null)} />
-              )}
+              
             </>
           )}
         </div>
