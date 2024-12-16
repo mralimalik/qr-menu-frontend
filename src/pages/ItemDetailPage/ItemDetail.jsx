@@ -50,9 +50,7 @@ const ItemDetail = ({}) => {
   // to fetch item data and their modifiers using itemId
   const fetchModifiers = async () => {
     try {
-      const response = await axios.get(
-        `${apiurl}modifier/${itemId}`
-      );
+      const response = await axios.get(`${apiurl}modifier/${itemId}`);
 
       // Only set modifiers if status code is 200
       if (response.status === 200) {
@@ -222,7 +220,7 @@ const ItemDetail = ({}) => {
         addOnPrices: total,
       };
       storeItemsInCartandLocal(addedItem);
-      toast.error(`Successfully added to cart`);
+      toast.success(`Successfully added to cart`);
     } else {
       toast.error(`Quantity can't be zero `);
     }
@@ -255,9 +253,10 @@ const ItemDetail = ({}) => {
             {itemData?.itemName}
           </h3>
 
-          <h3 className="font-normal text-base text-slate-600">
-            {itemData?.description}
-          </h3>
+          <h3
+            className="font-normal text-base text-slate-600"
+            dangerouslySetInnerHTML={{ __html: itemData?.description }}
+          />
 
           {/* different item prices  based on their sizes or servings*/}
           {itemData?.price.map((price, index) => {

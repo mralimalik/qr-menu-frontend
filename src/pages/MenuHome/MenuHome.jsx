@@ -48,7 +48,7 @@ const MenuHome = () => {
 
   return (
     <div>
-      <div>
+      <div className="mb-20">
         <div className="bg-violet-400 p-3 text-xl text-white font-semibold flex justify-center  ">
           <h4>{venueData ? venueData.venueName : ""} Menu</h4>
         </div>
