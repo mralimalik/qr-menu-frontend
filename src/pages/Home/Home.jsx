@@ -52,10 +52,7 @@ const Home = () => {
   const shouldShowDeliveryButton =
     orderSettings?.settings?.delivery?.orderEnabled;
   const orderStatusNavigation = () => {
-    
-      navigate(`/${venueData.venueId}/order-status`);
-     
-    
+    navigate(`/${venueData.venueId}/order-status`);
   };
 
   return (
@@ -75,10 +72,12 @@ const Home = () => {
           </h1>
 
           {orderType === "table" && (
-            <MenuButton 
-            buttonText={menus && menus.length === 0 ?"Menu is not ready":"Go to Menu"}
-
-            handleMenu={() => handleMenuSelection("table")} />
+            <MenuButton
+              buttonText={
+                menus && menus.length === 0 ? "Menu is not ready" : "Go to Menu"
+              }
+              handleMenu={() => handleMenuSelection("table")}
+            />
           )}
 
           {orderType !== "table" && (
@@ -91,13 +90,20 @@ const Home = () => {
               )} */}
 
               <MenuButton
-                buttonText={menus && menus.length === 0 ?"Menu is not ready":"Go to Menu"}
+                buttonText={
+                  menus && menus.length === 0
+                    ? "Menu is not ready"
+                    : "Go to Menu"
+                }
                 handleMenu={() => handleMenuSelection(null)}
               />
             </>
           )}
         </div>
-        <div className="border-y-2 py-4 px-2 cursor-pointer" onClick={orderStatusNavigation}>
+        <div
+          className="border-y-2 py-4 px-2 cursor-pointer"
+          onClick={orderStatusNavigation}
+        >
           <p>📄 Order Status</p>
         </div>
       </div>
