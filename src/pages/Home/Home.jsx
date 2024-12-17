@@ -75,7 +75,10 @@ const Home = () => {
           </h1>
 
           {orderType === "table" && (
-            <MenuButton handleMenu={() => handleMenuSelection("table")} />
+            <MenuButton 
+            buttonText={menus && menus.length === 0 ?"Menu is not ready":"Go to Menu"}
+
+            handleMenu={() => handleMenuSelection("table")} />
           )}
 
           {orderType !== "table" && (
@@ -88,7 +91,7 @@ const Home = () => {
               )} */}
 
               <MenuButton
-                buttonText="Go to Menu"
+                buttonText={menus && menus.length === 0 ?"Menu is not ready":"Go to Menu"}
                 handleMenu={() => handleMenuSelection(null)}
               />
             </>
