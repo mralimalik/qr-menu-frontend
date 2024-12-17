@@ -94,7 +94,7 @@ const Home = () => {
             </>
           )}
         </div>
-        <div className="border-y-2 py-4 px-2" onClick={orderStatusNavigation}>
+        <div className="border-y-2 py-4 px-2 cursor-pointer" onClick={orderStatusNavigation}>
           <p>📄 Order Status</p>
         </div>
       </div>
@@ -110,7 +110,7 @@ export default Home;
 export const MenuButton = ({ handleMenu, buttonText = "Go to Menu" }) => {
   return (
     <button
-      className="text-md bg-violet-400 py-2 text-white w-80 rounded-md"
+      className="text-md bg-violet-400 py-2 text-white w-80 rounded-md cursor-pointer"
       onClick={handleMenu}
     >
       {buttonText}

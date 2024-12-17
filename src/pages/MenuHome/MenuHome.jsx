@@ -23,6 +23,7 @@ const MenuHome = () => {
   const { calculateTotalCartPrice ,addItemToCart ,isCartButtonVisible} = useContext(CartContext);
 
   const { getMenuesItemsandSections, setMenuItemsData, menuItemsData } =  useContext(MenuContext);
+  
   const { venueId, menuId } = useParams();
   const navigate = useNavigate();
 
@@ -36,6 +37,7 @@ const MenuHome = () => {
     "Starter",
     "Salad",
   ];
+
   useEffect(() => {
     console.log(menuId);
     getSelectedMenuData(venueId, menuId);

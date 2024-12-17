@@ -267,6 +267,7 @@ const ItemDetail = ({}) => {
                 </h3>
                 {itemData.price.length > 1 && (
                   <input
+                  className="cursor-pointer"
                     type="checkbox"
                     name="priceselect"
                     id="priceselect"
@@ -324,7 +325,7 @@ const ItemDetail = ({}) => {
 
                             <div className="flex gap-2 items-center justify-center">
                               <div
-                                className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center"
+                                className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center cursor-pointer"
                                 onClick={() => {
                                   addModifiers(
                                     modifierGroup.modifierId,
@@ -344,7 +345,7 @@ const ItemDetail = ({}) => {
                               <p className="text-xl">{modifierQuantityValue}</p>
 
                               <div
-                                className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center"
+                                className="border border-red-400 h-7 w-7 rounded-full  flex justify-center items-center cursor-pointer"
                                 onClick={() => {
                                   addModifiers(
                                     modifierGroup.modifierId,
@@ -373,7 +374,7 @@ const ItemDetail = ({}) => {
 
           {/* add to cart button */}
           {isCartButtonVisible() && (
-            <div className="fixed bottom-0 py-2  max-[410px]:w-full w-[410px] left-0 px-3 bg-white">
+            <div className="fixed bottom-0 py-2  max-[410px]:w-full w-[410px] left-0 px-3 bg-white ">
               <div className="flex justify-between items-center gap-2">
                 <div className="flex gap-2 items-center justify-center">
                   <div

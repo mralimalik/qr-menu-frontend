@@ -125,7 +125,7 @@ const OrderSummary = () => {
           <h3 className="font-semibold text-lg text-gray-700">Order Summary</h3>
           <button
             onClick={toggleDetails}
-            className="text-purple-600 text-sm hover:text-purple-800"
+            className="text-purple-600 text-sm hover:text-purple-800 cursor-pointer"
           >
             {isDetailsVisible ? "Hide details" : "Show details"}
           </button>
@@ -199,7 +199,7 @@ const OrderSummary = () => {
         </div>
       </div>
 
-      <div className="flex justify-center w-full" onClick={handleMenuNavigation}>
+      <div className="flex justify-center w-full cursor-pointer" onClick={handleMenuNavigation}>
         <button
           className={`bg-purple-500 text-white  w-full py-2 mx-5 rounded-lg font-semibold`}
         >

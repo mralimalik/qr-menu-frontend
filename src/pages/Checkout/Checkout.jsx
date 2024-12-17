@@ -83,7 +83,7 @@ const Checkout = () => {
       </div>
       {isCartButtonVisible(orderType, orderSettings) && (
         <div
-          className="px-4 py-2 bg-white fixed bottom-0 w-full"
+          className="px-4 py-2 bg-white fixed bottom-0 w-full cursor-pointer"
           onClick={handleCheckout}
         >
           <button
@@ -130,7 +130,7 @@ export const OrderSummary = ({ deliveryFee, totalCartValue }) => {
         <h3 className="font-semibold text-lg text-gray-700">Order Summary</h3>
         <button
           onClick={toggleDetails}
-          className="text-purple-600 text-sm hover:text-purple-800"
+          className="text-purple-600 text-sm hover:text-purple-800 cursor-pointer"
         >
           {isDetailsVisible ? "Hide details" : "Show details"}
         </button>

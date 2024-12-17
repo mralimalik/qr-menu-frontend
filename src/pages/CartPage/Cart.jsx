@@ -280,7 +280,7 @@ const Cart = () => {
                 {/* delete icon */}
                 {item.totalQuantity === 1 && (
                   <button
-                    className="text-red-500"
+                    className="text-red-500 cursor-pointer"
                     onClick={() => handleDeleteItem(index)}
                   >
                     &#128465;
@@ -348,7 +348,7 @@ const Cart = () => {
         </div>
       </div>
       {isCartButtonVisible(orderType, orderSettings) && (
-        <div className="px-2 py-2 bg-white fixed bottom-0 w-full" onClick={handleCheckout}>
+        <div className="px-2 py-2 bg-white fixed bottom-0 w-full cursor-pointer" onClick={handleCheckout}>
           <button className={`${cartItems?.length===0?"bg-purple-200":"bg-purple-500"} text-white w-[400px] py-2 rounded-lg font-semibold`}>
             Checkout (${totalCartValue.toFixed(2)})
           </button>
