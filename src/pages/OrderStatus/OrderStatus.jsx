@@ -31,9 +31,10 @@ const OrderStatus = () => {
   };
 
   const handleSearch = async () => {
-    if (inputOrderId) {
-      setOrderId('');
+    if (inputOrderId && inputOrderId !== orderId) {
       setOrderId(inputOrderId);
+    } else if (inputOrderId === orderId) {
+   await   getOrderDetails();
     }
   };
 
