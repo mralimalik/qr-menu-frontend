@@ -32,6 +32,7 @@ const OrderStatus = () => {
 
   const handleSearch = async () => {
     if (inputOrderId) {
+      setOrderId('');
       setOrderId(inputOrderId);
     }
   };
