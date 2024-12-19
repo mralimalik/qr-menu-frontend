@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { VenueContext } from "../../context/VenueContext";
 import SelectMenuDialog from "../../component/SelectMenuDialog/SelectMenuDialog.jsx";
 import "./Home.css";
-
+import LoadingIndicator from "../../component/LoadingIndicator/LoadingIndicator.jsx";
 const Home = () => {
   const {
     venueData,
@@ -13,6 +13,7 @@ const Home = () => {
     orderSettings,
     orderType,
     storeOrderTypeInLocal,
+    loading
   } = useContext(VenueContext);
 
   const [isMenuDialogOpen, setIsMenuDialogOpen] = useState(false);
@@ -110,6 +111,7 @@ const Home = () => {
       {isMenuDialogOpen && (
         <SelectMenuDialog menus={menus} onClose={handleMenuDialogClose} />
       )}
+      <LoadingIndicator loading={loading}/>
     </div>
   );
 };

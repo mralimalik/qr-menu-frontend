@@ -2,19 +2,30 @@ import React, { useEffect, useContext, useState } from "react";
 
 import { useParams, useNavigate, replace } from "react-router-dom";
 import { CartContext } from "../../context/CartContext";
+import LoadingIndicator from "../../component/LoadingIndicator/LoadingIndicator.jsx";
 
 const OrderSummary = () => {
   const navigate = useNavigate();
-  const {venueId,menuId, orderId } = useParams();
+  const { venueId, menuId, orderId } = useParams();
   const { getOrder, orderData } = useContext(CartContext);
 
+  const [loading, setLoading] = useState(false);
   const [itemsPrice, setItemsPrice] = useState(0);
   const [subtotal, setSubtotal] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
 
+  const handleOrderDataFetch = async () => {
+    try {
+      setLoading(true);
+      await getOrder(orderId);
+    } catch (e) {
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     if (orderId) {
-      getOrder(orderId);
+      handleOrderDataFetch();
     }
   }, [orderId]);
 
@@ -62,7 +73,7 @@ const OrderSummary = () => {
 
   const handleMenuNavigation = () => {
     navigate(`/${venueId}/menu/${menuId}`, { replace: true });
-};
+  };
 
   return (
     <div className="w-full mb-3">
@@ -109,7 +120,7 @@ const OrderSummary = () => {
           <p>
             <strong className="text-gray-800">Time:</strong>{" "}
             <span className="font-bold text-black">
-              {formatDate(orderData?.createdAt  || 0)}
+              {formatDate(orderData?.createdAt || 0)}
             </span>
           </p>
         </div>
@@ -163,32 +174,32 @@ const OrderSummary = () => {
           <div className="py-3 flex flex-col gap-2">
             <div className="flex justify-between ">
               <p>Items</p>
-              <p>${itemsPrice.toFixed(2)|| 0}</p>
+              <p>${itemsPrice.toFixed(2) || 0}</p>
             </div>
             <div className="flex justify-between">
               <p>Subtotal</p>
-              <p>${subtotal.toFixed(2)|| 0}</p>
+              <p>${subtotal.toFixed(2) || 0}</p>
             </div>
             {/* only show fees if there are items */}
 
             {orderData?.orderType === "DELIVERY" && (
               <div className="flex justify-between">
                 <p>Delivery Fee</p>
-                <p>${orderData?.appliedCharges.delivery.toFixed(2)||0}</p>
+                <p>${orderData?.appliedCharges.delivery.toFixed(2) || 0}</p>
               </div>
             )}
 
             <div className="flex justify-between">
               <p>{"Taxes"}</p>
-              <p>${orderData?.appliedCharges.tax.toFixed(2)||0}</p>
+              <p>${orderData?.appliedCharges.tax.toFixed(2) || 0}</p>
             </div>
             <div className="flex justify-between">
               <p>{"Service Charge"}</p>
-              <p>${orderData?.appliedCharges.serviceCharge.toFixed(2)||0}</p>
+              <p>${orderData?.appliedCharges.serviceCharge.toFixed(2) || 0}</p>
             </div>
             <div className="flex justify-between">
               <p>{"Discount"}</p>
-              <p>${orderData?.appliedCharges.discount.toFixed(2)||0}</p>
+              <p>${orderData?.appliedCharges.discount.toFixed(2) || 0}</p>
             </div>
 
             <div className="flex justify-between font-bold">
@@ -199,13 +210,17 @@ const OrderSummary = () => {
         </div>
       </div>
 
-      <div className="flex justify-center w-full cursor-pointer" onClick={handleMenuNavigation}>
+      <div
+        className="flex justify-center w-full cursor-pointer"
+        onClick={handleMenuNavigation}
+      >
         <button
           className={`bg-purple-500 text-white  w-full py-2 mx-5 rounded-lg font-semibold`}
         >
           Go to Menu
         </button>
       </div>
+      <LoadingIndicator loading={loading} />
     </div>
   );
 };

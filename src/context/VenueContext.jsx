@@ -6,6 +6,8 @@ import { apiurl } from "../constants/apiconst.js";
 export const VenueContext = createContext();
 
 export const VenueContextProvider = ({ children }) => {
+  const [loading, setLoading] = useState(false);
+
   // get venueId from params
   const { venueId } = useParams();
   // using location to check in params
@@ -30,9 +32,8 @@ export const VenueContextProvider = ({ children }) => {
   //to fetch venue data
   const fetchVenueData = async () => {
     try {
-      const response = await axios.get(
-        `${apiurl}venue/qr/${venueId}`
-      );
+      setLoading(true);
+      const response = await axios.get(`${apiurl}venue/qr/${venueId}`);
       if (response.status === 200) {
         setVenueData(response.data.venue);
         setMenus(response.data.menus);
@@ -47,6 +48,9 @@ export const VenueContextProvider = ({ children }) => {
         "Error fetching venue data:",
         err.response?.data?.message || err
       );
+    }finally{
+      setLoading(false);
+
     }
   };
 
@@ -69,9 +73,8 @@ export const VenueContextProvider = ({ children }) => {
   // to get data of selected menu
   const getSelectedMenuData = async (venueId, menuId) => {
     try {
-      const response = await axios.get(
-        `${apiurl}menu/qr/${venueId}/${menuId}`
-      );
+      setLoading(true);
+      const response = await axios.get(`${apiurl}menu/qr/${venueId}/${menuId}`);
 
       // Handle the response after successfully creating a venue
       if (response.data) {
@@ -79,19 +82,22 @@ export const VenueContextProvider = ({ children }) => {
       }
     } catch (err) {
       console.log("Error getting menu with no item:", err);
+    }finally{
+      setLoading(false);
     }
   };
 
   // to fetch table data if there table id in parms
   const fetchTableData = async (tableId) => {
     try {
+      setLoading(true);
       const response = await axios.get(
         `${apiurl}table/${venueId}/table/${tableId}`
       );
       if (response.status === 200) {
         setTableData(response.data.data);
         console.log(response.data.data);
-      } 
+      }
     } catch (err) {
       localStorage.removeItem("tableId");
       storeOrderTypeInLocal(null); // Remove the order type if table is not found
@@ -100,6 +106,9 @@ export const VenueContextProvider = ({ children }) => {
         "Error fetching table data:",
         err.response?.data?.message || err
       );
+    }finally{
+      setLoading(false);
+
     }
   };
 
@@ -176,7 +185,7 @@ export const VenueContextProvider = ({ children }) => {
         getSelectedMenuData,
         orderType,
         storeOrderTypeInLocal,
-        charges,
+        charges,loading,setLoading
       }}
     >
       {children}

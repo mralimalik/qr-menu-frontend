@@ -8,6 +8,7 @@ import { CartContext } from "../../context/CartContext";
 import { ToastContainer, toast } from "react-toastify";
 import { apiurl } from "../../constants/apiconst.js";
 import "react-toastify/dist/ReactToastify.css";
+import LoadingIndicator from "../../component/LoadingIndicator/LoadingIndicator.jsx";
 
 const ItemDetail = ({}) => {
   const { itemId } = useParams();
@@ -15,6 +16,7 @@ const ItemDetail = ({}) => {
   const { orderSettings, tableData, orderType } = useContext(VenueContext);
   const { storeItemsInCartandLocal } = useContext(CartContext);
 
+  const [loading, setLoading] = useState(false);
   // to store current item data
   const [itemData, setItemData] = useState(null);
   // to store item modifier
@@ -50,6 +52,7 @@ const ItemDetail = ({}) => {
   // to fetch item data and their modifiers using itemId
   const fetchModifiers = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(`${apiurl}modifier/${itemId}`);
 
       // Only set modifiers if status code is 200
@@ -61,6 +64,8 @@ const ItemDetail = ({}) => {
     } catch (error) {
       // Optionally log the error or display a generic message
       console.error("Error fetching modifiers:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -267,7 +272,7 @@ const ItemDetail = ({}) => {
                 </h3>
                 {itemData.price.length > 1 && (
                   <input
-                  className="cursor-pointer"
+                    className="cursor-pointer"
                     type="checkbox"
                     name="priceselect"
                     id="priceselect"
@@ -406,6 +411,7 @@ const ItemDetail = ({}) => {
 
         <ToastContainer />
       </div>
+      <LoadingIndicator loading={loading} />
     </div>
   );
 };

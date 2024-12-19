@@ -9,6 +9,8 @@ import MenuSectionBox from "../../component/MenuSectionBox/MenuSectionBox.jsx";
 import { CartContext } from "../../context/CartContext.jsx";
 import { ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import LoadingIndicator from "../../component/LoadingIndicator/LoadingIndicator.jsx";
+
 const MenuHome = () => {
   const {
     venueData,
@@ -19,11 +21,19 @@ const MenuHome = () => {
     getSelectedMenuData,
     orderType,
     orderSettings,
+    loading,
+    setLoading,
   } = useContext(VenueContext);
-  const { calculateTotalCartPrice ,addItemToCart ,isCartButtonVisible} = useContext(CartContext);
+  const {
+    calculateTotalCartPrice,
+    addItemToCart,
+    isCartButtonVisible,
+    cartItems,
+  } = useContext(CartContext);
 
-  const { getMenuesItemsandSections, setMenuItemsData, menuItemsData } =  useContext(MenuContext);
-  
+  const { getMenuesItemsandSections, setMenuItemsData, menuItemsData } =
+    useContext(MenuContext);
+
   const { venueId, menuId } = useParams();
   const navigate = useNavigate();
 
@@ -38,10 +48,20 @@ const MenuHome = () => {
     "Salad",
   ];
 
+  const handleMenuItemDataFetch = async () => {
+    try {
+      setLoading(true);
+      await getMenuesItemsandSections(menuId);
+    } catch (e) {
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     console.log(menuId);
     getSelectedMenuData(venueId, menuId);
-    getMenuesItemsandSections(menuId);
+    handleMenuItemDataFetch();
   }, []);
 
   const handleViewCartClick = () => {
@@ -101,14 +121,19 @@ const MenuHome = () => {
           })}
         </div>
       </div>
-      {isCartButtonVisible(orderType, orderSettings) && (
-        <div className="p-3 bg-white fixed bottom-0 w-full">
-          <div className="bg-violet-400 py-[8px] text-white flex justify-center items-center font-medium  text-lg cursor-pointer w-[390px]" onClick={handleViewCartClick}>
-            <h4>View Cart ${calculateTotalCartPrice()}</h4>
+      {cartItems.length > 0 &&
+        isCartButtonVisible(orderType, orderSettings) && (
+          <div className="p-3 bg-white fixed bottom-0 w-full">
+            <div
+              className="bg-violet-400 py-[8px] text-white flex justify-center items-center font-medium  text-lg cursor-pointer w-[390px]"
+              onClick={handleViewCartClick}
+            >
+              <h4>View Cart ${calculateTotalCartPrice()}</h4>
+            </div>
           </div>
-        </div>
-      )}
-      <ToastContainer/>
+        )}
+      <ToastContainer />
+      <LoadingIndicator loading={loading} />
     </div>
   );
 };

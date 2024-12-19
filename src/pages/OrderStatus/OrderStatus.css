@@ -1,0 +1,5 @@
+.order-text-field::-webkit-inner-spin-button,
+.order-text-field::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
