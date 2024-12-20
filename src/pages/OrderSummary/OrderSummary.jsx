@@ -39,10 +39,8 @@ const OrderSummary = () => {
     if (orderData?.orderSummary) {
       const itemsTotal = orderData.orderSummary.reduce((total, item) => {
         return (
-          total +
-          item.itemPrice * item.quantity +
-          item.modifiers?.reduce((modifierTotal, modifier) => {
-            return modifierTotal + modifier.modifierPrice * modifier.quantity;
+          total + item.itemPrice * item.quantity + item.modifiers?.reduce((modifierTotal, modifier) => {
+            return modifierTotal + modifier.modifierPrice * modifier.quantity * item.quantity;
           }, 0)
         );
       }, 0);
