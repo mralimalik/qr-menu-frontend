@@ -79,18 +79,25 @@ const MenuHome = () => {
             {tableData.tableName}
           </div>
         )}
+
         <div className="mt-10 px-3">
           <h3 className="font-semibold text-2xl flex justify-center">
             {selectedMenu ? selectedMenu.menuName : ""}
           </h3>
-          <div className="w-full my-5">
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full py-3 px-4 border rounded-full "
-            />
-          </div>
-
+          {menuItemsData.length === 0 && (
+            <h3 className="font-medium flex flex-col justify-center items-center mt-36">
+              Mene is not ready yet
+            </h3>
+          )}
+          {menuItemsData.length > 0 && (
+            <div className="w-full my-5">
+              <input
+                type="text"
+                placeholder="Search"
+                className="w-full py-3 px-4 border rounded-full "
+              />
+            </div>
+          )}
           <div className="scrollable-menu flex gap-5 w-ful overflow-x-auto">
             {menuItemsData.map((parentMenu, index) => {
               if (parentMenu.type === "SECTION") {
