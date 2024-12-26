@@ -16,7 +16,7 @@ const Cart = () => {
 
   
 
-  const { charges, orderSettings, orderType, tableData } =
+  const { charges, orderSettings, orderType, tableData ,selectedMenu} =
     useContext(VenueContext);
 
 
@@ -347,7 +347,7 @@ const Cart = () => {
           </div>
         </div>
       </div>
-      {isCartButtonVisible(orderType, orderSettings) && (
+      {isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
         <div className="px-2 py-2 bg-white fixed bottom-0 w-full cursor-pointer" onClick={handleCheckout}>
           <button className={`${cartItems?.length===0?"bg-purple-200":"bg-purple-500"} text-white w-[400px] py-2 rounded-lg font-semibold`}>
             Checkout (${totalCartValue.toFixed(2)})

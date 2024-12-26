@@ -7,9 +7,8 @@ import { apiurl } from "../constants/apiconst.js";
 export const CartContext = createContext();
 
 export const CartContextProvider = ({ children }) => {
-  const { venueId,menuId } = useParams();
-  const navigate = useNavigate(); 
-
+  const { venueId, menuId } = useParams();
+  const navigate = useNavigate();
 
   const [cartItems, setCartItems] = useState(() => {
     const savedCartItems = localStorage.getItem("cartItems");
@@ -24,7 +23,7 @@ export const CartContextProvider = ({ children }) => {
     delivery: 0,
   });
 
-  const [orderData, setOrderData] = useState(null)
+  const [orderData, setOrderData] = useState(null);
 
   const storeItemsInCartandLocal = (itemData) => {
     setCartItems((prev) => [...prev, itemData]);
@@ -39,6 +38,7 @@ export const CartContextProvider = ({ children }) => {
     const addedItem = {
       itemId: itemData._id,
       menuId: itemData.menuId,
+      sectionId:itemData.parentId,
       itemPriceName: itemData.price[0].name,
       itemName: itemData.itemName,
       addOnPrices: 0,
@@ -53,16 +53,43 @@ export const CartContextProvider = ({ children }) => {
   };
 
   // to show cart button or not depending on data from dashboard
-  const isCartButtonVisible = (orderType, orderSettings) => {
-    if (!orderType || !orderSettings) return false;
+  // const isCartButtonVisible = (orderType, orderSettings, menuOrderSettings) => {
+  //   if (!orderType || !orderSettings) return false;
 
+  //   switch (orderType) {
+  //     case "table":
+  //       return orderSettings?.settings?.dineIn?.orderEnabled;
+  //     case "delivery":
+  //       return orderSettings?.settings?.delivery?.orderEnabled;
+  //     case "pickup":
+  //       return orderSettings?.settings?.pickup?.orderEnabled;
+  //     default:
+  //       return false;
+  //   }
+  // };
+  const isCartButtonVisible = (orderType, orderSettings, menuOrderSettings) => {
+    if (!orderType || !orderSettings || !menuOrderSettings) return false;
+
+    // Check for different order types (table, delivery, pickup)
     switch (orderType) {
       case "table":
-        return orderSettings?.settings?.dineIn?.orderEnabled;
+        // Check if dineIn is enabled in both orderSettings and menuOrderSettings
+        return (
+          orderSettings?.settings?.dineIn?.orderEnabled &&
+          menuOrderSettings?.dineIn?.orderEnabled
+        );
       case "delivery":
-        return orderSettings?.settings?.delivery?.orderEnabled;
+        // Check if delivery is enabled in both orderSettings and menuOrderSettings
+        return (
+          orderSettings?.settings?.delivery?.orderEnabled &&
+          menuOrderSettings?.delivery?.orderEnabled
+        );
       case "pickup":
-        return orderSettings?.settings?.pickup?.orderEnabled;
+        // Check if pickup is enabled in both orderSettings and menuOrderSettings
+        return (
+          orderSettings?.settings?.pickup?.orderEnabled &&
+          menuOrderSettings?.pickup?.orderEnabled
+        );
       default:
         return false;
     }
@@ -75,32 +102,34 @@ export const CartContextProvider = ({ children }) => {
 
     const orderSummary = cart.map((item) => {
       return {
+        itemId:item.itemId,
+        sectionId:item.sectionId,
         itemName: item.itemName,
-        itemSizeName: item.itemPriceName || "Regular", // Default to "Regular" if not provided
+        itemSizeName: item.itemPriceName || "Regular", 
         itemPrice: item.itemPrice,
         quantity: item.totalQuantity,
         modifiers: item.modifiers.map((modifier) => ({
-          modifierName: modifier.modifierItemName,
-          modifierPrice: modifier.modifierPrice,
+          modifierGroupId:modifier.modifierId,
+          modifierPriceId:modifier.modifierPriceId,
+          modifierName: modifier.modifierItemName || '',
+          modifierPrice: modifier.modifierPrice || 0,
           quantity: modifier.quantity,
         })),
       };
     });
 
     return {
-      orderType: orderType, // This would likely come from the front-end selection
-      paymentMethod: "CASH", // This would come from the front-end selection
+      menuId:menuId,
+      orderType: orderType,
+      paymentMethod: "CASH",
       orderSummary: orderSummary,
       customerInfo: customerInfo,
       tableName: tableName,
-      appliedCharges
+      appliedCharges,
     };
   };
 
- 
-
-
-  const calculateDeliveryFee = (orderType,orderSettings) => {
+  const calculateDeliveryFee = (orderType, orderSettings) => {
     return orderType === "delivery" &&
       orderSettings?.settings?.delivery?.deliveryFee
       ? orderSettings.settings.delivery.deliveryFee
@@ -111,7 +140,8 @@ export const CartContextProvider = ({ children }) => {
     return cartItems?.reduce((total, item) => total + item.totalPrice, 0) || 0;
   };
 
-  const calculateAdditionalCharges = (subtotal,charges) => {
+  // calculate the charges
+  const calculateAdditionalCharges = (subtotal, charges) => {
     let tax = 0;
     let serviceCharge = 0;
 
@@ -150,7 +180,8 @@ export const CartContextProvider = ({ children }) => {
     return tax + serviceCharge;
   };
 
-  const calculateDiscount = (subtotal,charges) => {
+  //calculate discount 
+  const calculateDiscount = (subtotal, charges) => {
     let discount = 0;
 
     if (charges) {
@@ -175,11 +206,14 @@ export const CartContextProvider = ({ children }) => {
   };
 
   // Function to calculate the total cart value
-  const calculateTotalCartValue = (charges,orderType,orderSettings) => {
+  const calculateTotalCartValue = (charges, orderType, orderSettings) => {
     const subtotal = calculateSubtotal();
-    const discount = calculateDiscount(subtotal,charges); // Calculate discount
-    const delivery = calculateDeliveryFee(orderType,orderSettings);
-    const additionalCharges = calculateAdditionalCharges(subtotal - discount,charges); // Apply additional charges after discount
+    const discount = calculateDiscount(subtotal, charges); // Calculate discount
+    const delivery = calculateDeliveryFee(orderType, orderSettings);
+    const additionalCharges = calculateAdditionalCharges(
+      subtotal - discount,
+      charges
+    ); // Apply additional charges after discount
 
     // Update applied charges map using spread operator to update specific fields
     setAppliedCharges((prevCharges) => ({
@@ -190,7 +224,9 @@ export const CartContextProvider = ({ children }) => {
     return subtotal - discount + delivery + additionalCharges;
   };
 
-  const createOrder = async (venue, tableName, customerInfo) => {
+
+  // create order function
+  const createOrder = async (venue, tableName, customerInfo,) => {
     try {
       const orderData = transformCartToOrder(
         cartItems,
@@ -213,29 +249,29 @@ export const CartContextProvider = ({ children }) => {
         });
         toast.success("Order Created Successfully");
 
-           // Replace the route
-      const orderId = response.data.order._id; 
-      navigate(`/${venueId}/menu/${menuId}/order-summary/${orderId}`, { replace: true });
-
+        // Replace the route
+        const orderId = response.data.order._id;
+        navigate(`/${venueId}/menu/${menuId}/order-summary/${orderId}`, {
+          replace: true,
+        });
       }
     } catch (e) {
+      toast.error("Error creating order");
       console.log("error creating order ", e);
     }
   };
 
+  // get the order details using orderId or order doc id
   const getOrder = async (orderId) => {
     try {
-    
       const url = `${apiurl}order/${orderId}`;
 
       const response = await axios.get(url);
 
       if (response.status === 200) {
-    
-           // Replace the route
-      const orderId = response.data.data;
-      setOrderData(orderId); 
-
+        // Replace the route
+        const orderId = response.data.data;
+        setOrderData(orderId);
       }
     } catch (e) {
       console.log("error creating order ", e);
@@ -264,7 +300,7 @@ export const CartContextProvider = ({ children }) => {
         calculateSubtotal,
         createOrder,
         getOrder,
-        orderData
+        orderData,
       }}
     >
       {children}

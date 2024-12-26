@@ -18,7 +18,7 @@ const Checkout = () => {
     createOrder,
   } = useContext(CartContext);
 
-  const { charges, orderSettings, orderType, tableData, venueData } =
+  const { charges, orderSettings, orderType, tableData, venueData ,selectedMenu} =
     useContext(VenueContext);
 
   // to set total cart value
@@ -43,7 +43,7 @@ const Checkout = () => {
   }, [cartItems, deliveryFee, charges, orderType]);
 
   const [loading, setLoading] = useState(false);
-  const handleCheckout = () => {
+  const handleCheckout = async() => {
     try {
       setLoading(true);
       if (cartItems && cartItems.length > 0 && venueId && menuId) {
@@ -54,7 +54,7 @@ const Checkout = () => {
       }
       setLoading(false);
     } catch (e) {
-      console.log("error creating order");
+      console.log("error creating order",e);
     } finally {
       setLoading(false);
     }
@@ -81,7 +81,7 @@ const Checkout = () => {
 
         {/* total price div */}
       </div>
-      {isCartButtonVisible(orderType, orderSettings) && (
+      {isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
         <div
           className="px-4 py-2 bg-white fixed bottom-0 w-full cursor-pointer"
           onClick={handleCheckout}

@@ -13,8 +13,8 @@ import LoadingIndicator from "../../component/LoadingIndicator/LoadingIndicator.
 const ItemDetail = ({}) => {
   const { itemId } = useParams();
 
-  const { orderSettings, tableData, orderType } = useContext(VenueContext);
-  const { storeItemsInCartandLocal } = useContext(CartContext);
+  const { orderSettings, tableData, orderType,selectedMenu } = useContext(VenueContext);
+  const { storeItemsInCartandLocal,isCartButtonVisible } = useContext(CartContext);
 
   const [loading, setLoading] = useState(false);
   // to store current item data
@@ -34,20 +34,20 @@ const ItemDetail = ({}) => {
   const [modifierQuantity, setModifierQuantity] = useState([]);
 
   // to show cart button or not depending on data from dashboard
-  const isCartButtonVisible = () => {
-    if (!orderType || !orderSettings) return false; // Do not show if orderType is null or orderSettings is missing
+  // const isCartButtonVisible = () => {
+  //   if (!orderType || !orderSettings) return false; // Do not show if orderType is null or orderSettings is missing
 
-    switch (orderType) {
-      case "table":
-        return orderSettings?.settings?.dineIn?.orderEnabled;
-      case "delivery":
-        return orderSettings?.settings?.delivery?.orderEnabled;
-      case "pickup":
-        return orderSettings?.settings?.pickup?.orderEnabled;
-      default:
-        return false;
-    }
-  };
+  //   switch (orderType) {
+  //     case "table":
+  //       return orderSettings?.settings?.dineIn?.orderEnabled;
+  //     case "delivery":
+  //       return orderSettings?.settings?.delivery?.orderEnabled;
+  //     case "pickup":
+  //       return orderSettings?.settings?.pickup?.orderEnabled;
+  //     default:
+  //       return false;
+  //   }
+  // };
 
   // to fetch item data and their modifiers using itemId
   const fetchModifiers = async () => {
@@ -214,6 +214,7 @@ const ItemDetail = ({}) => {
       });
 
       const addedItem = {
+        sectionId: itemData.parentId,
         itemId: itemData._id,
         menuId: itemData.menuId,
         itemName: itemData.itemName,
@@ -378,7 +379,7 @@ const ItemDetail = ({}) => {
           )}
 
           {/* add to cart button */}
-          {isCartButtonVisible() && (
+          { isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
             <div className="fixed bottom-0 py-2  max-[410px]:w-full w-[410px] left-0 px-3 bg-white ">
               <div className="flex justify-between items-center gap-2">
                 <div className="flex gap-2 items-center justify-center">

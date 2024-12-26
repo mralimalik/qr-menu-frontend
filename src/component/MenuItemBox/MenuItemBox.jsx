@@ -4,7 +4,7 @@ import { VenueContext } from "../../context/VenueContext.jsx";
 import { useNavigate, useParams } from "react-router-dom";
 import { CartContext } from "../../context/CartContext.jsx";
 const MenuItemBox = ({ item }) => {
-  const { orderSettings, tableData, orderType } = useContext(VenueContext);
+  const { orderSettings, tableData, orderType,selectedMenu } = useContext(VenueContext);
   const { venueId, menuId } = useParams(); // Get the venueId from the route parameters
   const { calculateTotalCartPrice, addItemToCart, isCartButtonVisible } =
     useContext(CartContext);
@@ -14,6 +14,7 @@ const MenuItemBox = ({ item }) => {
   const handleClick = () => {
     navigate(`/${venueId}/menu/${menuId}/item/${item._id}`);
   };
+console.log(item);
 
   return (
     <div>
@@ -38,7 +39,7 @@ const MenuItemBox = ({ item }) => {
               <p className="text-white text-center">No Image</p> // Fallback text if no image is available
             )}
           </div>
-          {isCartButtonVisible(orderType, orderSettings, tableData) && (
+          {isCartButtonVisible(orderType, orderSettings, selectedMenu.orderSettings) && (
             <div
               className="bg-violet-500 px-2 rounded-md flex justify-center items-center cursor-pointer"
               onClick={(e) => {
