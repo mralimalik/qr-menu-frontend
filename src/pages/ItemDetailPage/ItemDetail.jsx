@@ -234,9 +234,9 @@ const ItemDetail = ({}) => {
 
   return (
     <div className="bg-white flex justify-start ">
-      <div className="main-div h-screen w-[410px]  overflow-y-auto  relative overflow-hidden">
+      <div className="main-div h-screen   overflow-y-auto  relative overflow-hidden sm:w-[410px] w-full">
         {/* {image div} */}
-        <div className="w-[410px] object-cover h-[300px] bg-slate-400 fixed">
+        <div className="sm:w-[410px] w-full object-cover h-[300px] bg-slate-400 fixed">
           {/* Check if itemData.image exists, and render the image */}
           {itemData?.image ? (
             <img
@@ -380,7 +380,7 @@ const ItemDetail = ({}) => {
 
           {/* add to cart button */}
           { isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
-            <div className="fixed bottom-0 py-2  max-[410px]:w-full w-[410px] left-0 px-3 bg-white ">
+            <div className="fixed bottom-0 py-2  sm:w-[410px] w-full left-0 px-3 bg-white ">
               <div className="flex justify-between items-center gap-2">
                 <div className="flex gap-2 items-center justify-center">
                   <div

@@ -130,9 +130,9 @@ const MenuHome = () => {
       </div>
       {cartItems.length > 0 &&
         isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
-          <div className="p-3 bg-white fixed bottom-0 w-full">
+          <div className="p-3 bg-white fixed bottom-0 w-full flex">
             <div
-              className="bg-violet-400 py-[8px] text-white flex justify-center items-center font-medium  text-lg cursor-pointer w-[390px]"
+              className="bg-violet-400 py-[8px] text-white flex justify-center items-center font-medium  text-lg cursor-pointer sm:w-[380px] w-full rounded-lg"
               onClick={handleViewCartClick}
             >
               <h4>View Cart ${calculateTotalCartPrice()}</h4>

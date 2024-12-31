@@ -10,7 +10,7 @@ function VenueLayout() {
       <VenueContextProvider>
         <MenuContextProvider>
           <CartContextProvider>
-          <div className="w-[420px] h-full shadow-md">
+          <div className="w-full md:w-[420px] h-full shadow-md">
           <Outlet />
           </div>
           </CartContextProvider>

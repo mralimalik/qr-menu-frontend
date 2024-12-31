@@ -89,7 +89,7 @@ const Checkout = () => {
           <button
             className={`${
               cartItems?.length === 0 ? "bg-purple-200" : "bg-purple-500"
-            } text-white w-[400px] py-2 rounded-lg font-semibold`}
+            } text-white sm:w-[380px] w-full py-2 rounded-lg font-semibold`}
           >
             {!loading ? (
               <>Checkout (${totalCartValue.toFixed(2)})</>
