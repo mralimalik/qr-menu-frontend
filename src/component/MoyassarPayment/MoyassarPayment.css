@@ -1,0 +1,30 @@
+/* Customize the text fields */
+#moyasar-payment input {
+    border: 2px solid #4caf50; /* Green border */
+    border-radius: 5px;       /* Rounded corners */
+    padding: 10px;            /* Spacing inside the field */
+    font-size: 16px;          /* Text size */
+  }
+  
+  /* Customize placeholder text */
+  #moyasar-payment input::placeholder {
+    color: #9e9e9e;           /* Light gray color */
+    font-style: italic;       /* Italic placeholder text */
+  }
+  
+  /* Customize buttons */
+  #moyasar-payment button {
+    background-color: #4caf50; /* Green background */
+    color: white;             /* White text */
+    border: none;             /* No border */
+    border-radius: 5px;       /* Rounded corners */
+    padding: 10px 20px;       /* Spacing inside the button */
+    font-size: 16px;          /* Text size */
+    cursor: pointer;          /* Pointer cursor on hover */
+  }
+  
+  /* Button hover effect */
+  #moyasar-payment button:hover {
+    background-color: #45a049; /* Darker green on hover */
+  }
+  

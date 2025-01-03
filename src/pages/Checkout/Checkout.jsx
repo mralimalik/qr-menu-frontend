@@ -3,23 +3,31 @@ import { useContext } from "react";
 import { CartContext } from "../../context/CartContext";
 import { VenueContext } from "../../context/VenueContext";
 import { useNavigate, useParams } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import axios from "axios";
+
+import { CardPaymentSheet } from "../../component/CardPaymentSheet/CardPaymentSheet";
+import PaymentMethodSelector from "../../component/PaymentMethodSelector/PaymentMethodSelector";
+import { OrderSummary } from "../../component/CheckoutOrderSummary/OrderSummary.jsx";
 const Checkout = () => {
   const navigate = useNavigate();
   const { venueId, menuId } = useParams();
   const {
     cartItems,
-    setCartItems,
     isCartButtonVisible,
-    appliedCharges,
-    setAppliedCharges,
     calculateTotalCartValue,
     calculateDeliveryFee,
     createOrder,
   } = useContext(CartContext);
 
-  const { charges, orderSettings, orderType, tableData, venueData ,selectedMenu} =
-    useContext(VenueContext);
+  const {
+    charges,
+    orderSettings,
+    orderType,
+    tableData,
+    venueData,
+    selectedMenu,
+  } = useContext(VenueContext);
 
   // to set total cart value
   const [totalCartValue, setTotalCartValue] = useState(0);
@@ -43,22 +51,73 @@ const Checkout = () => {
   }, [cartItems, deliveryFee, charges, orderType]);
 
   const [loading, setLoading] = useState(false);
-  const handleCheckout = async() => {
+  const handleCheckout = async () => {
     try {
       setLoading(true);
       if (cartItems && cartItems.length > 0 && venueId && menuId) {
-        createOrder(venueData._id, tableData.tableName, "");
-        navigate(`/${venueId}/menu/${menuId}/checkout`);
+        if (selectedPaymentMethod === "CARD") {
+          setIsBottomSheetOpen(true);
+        } else if (selectedPaymentMethod === "CASH") {
+          createOrder(
+            venueData._id,
+            tableData.tableName,
+            "",
+            selectedPaymentMethod,
+            totalCartValue,
+            {}
+          );
+          navigate(`/${venueId}/menu/${menuId}/checkout`);
+        } else {
+          toast.error("Please select a payment method");
+        }
       } else {
         console.log("Cart is empty or missing venueId/menuId");
       }
       setLoading(false);
     } catch (e) {
-      console.log("error creating order",e);
+      console.log("error creating order", e);
     } finally {
       setLoading(false);
     }
   };
+
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+
+  const handleCardPayment = async (cardDetails) => {
+    try {
+     
+        createOrder(
+          venueData._id,
+          tableData.tableName,
+          "",
+          selectedPaymentMethod,
+          totalCartValue,
+          cardDetails
+        );
+        navigate(`/${venueId}/menu/${menuId}/checkout`);
+      
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      toast.error("Payment failed. Please try again.");
+    } finally {
+      setIsBottomSheetOpen(false);
+    }
+  };
+
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+
+  const paymentOptions = [
+    {
+      value: "CASH",
+      label: "Pay with Cash",
+      enabled: orderSettings?.paymentOptions?.cashPayment,
+    },
+    {
+      value: "CARD",
+      label: "Pay with Card",
+      enabled: orderSettings?.paymentOptions?.cardPayment,
+    },
+  ];
 
   return (
     <div className="bg-slate-100">
@@ -67,21 +126,29 @@ const Checkout = () => {
           {/* <button>&larr;</button> */}
           <h1 className="text-xl font-bold">Checkout</h1>
         </header>
+        {/* cart item list */}
 
         <OrderSummary
           deliveryFee={deliveryFee}
           totalCartValue={totalCartValue}
         />
-        {/* cart item list */}
-        <div className=" m-4 p-4 bg-white rounded-lg shadow-md">
-          <h3 className="font-semibold">
-            Payment Method: <span className="font-normal">Cash</span>
-          </h3>
+        <div className="m-4 p-4 bg-white rounded-lg shadow-md">
+          <h3 className="font-semibold">Payment Method:</h3>
+          <PaymentMethodSelector
+            selectedMethod={selectedPaymentMethod}
+            onChange={setSelectedPaymentMethod}
+            options={paymentOptions}
+          />
         </div>
 
         {/* total price div */}
       </div>
-      {isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
+
+      {isCartButtonVisible(
+        orderType,
+        orderSettings,
+        selectedMenu?.orderSettings
+      ) && (
         <div
           className="px-4 py-2 bg-white fixed bottom-0 w-full cursor-pointer"
           onClick={handleCheckout}
@@ -99,115 +166,15 @@ const Checkout = () => {
           </button>
         </div>
       )}
+
+      <CardPaymentSheet
+        handleCardPayment={handleCardPayment}
+        isOpen={isBottomSheetOpen}
+        onDismiss={() => setIsBottomSheetOpen(false)}
+      />
       <ToastContainer />
     </div>
   );
 };
 
 export default Checkout;
-
-export const OrderSummary = ({ deliveryFee, totalCartValue }) => {
-  const { cartItems, calculateSubtotal } = useContext(CartContext);
-
-  const { charges, orderSettings, orderType, tableData } =
-    useContext(VenueContext);
-  const [isDetailsVisible, setIsDetailsVisible] = useState(false);
-
-  const toggleDetails = () => {
-    setIsDetailsVisible(!isDetailsVisible);
-  };
-
-  const calculateChargeAmount = (charge) => {
-    if (charge.amountType === "PERCENT") {
-      return (calculateSubtotal() * charge.amount) / 100;
-    }
-    return charge.amount;
-  };
-
-  return (
-    <div className=" m-4 p-4 bg-white rounded-lg shadow-md">
-      <div className="flex justify-between items-center">
-        <h3 className="font-semibold text-lg text-gray-700">Order Summary</h3>
-        <button
-          onClick={toggleDetails}
-          className="text-purple-600 text-sm hover:text-purple-800 cursor-pointer"
-        >
-          {isDetailsVisible ? "Hide details" : "Show details"}
-        </button>
-      </div>
-      <div className="mt-4">
-        {isDetailsVisible &&
-          cartItems?.map((data, index) => (
-            <div key={index}>
-              <div className="flex items-center justify-between text-gray-800 my-2">
-                <span className="flex items-center gap-2">
-                  <span className="bg-slate-300 p-3 m-0 rounded-full text-center inline-block w-4 h-4 flex items-center justify-center">
-                    {data.totalQuantity}
-                  </span>
-                  {data.itemName}
-                </span>
-                <h2>${data.itemPrice}</h2>
-              </div>
-              {data?.modifiers.map((modifier, modifierIndex) => (
-                <div
-                  className="flex items-center justify-between text-gray-800 my-2 ml-4"
-                  key={modifierIndex}
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="bg-slate-300 p-3 m-0 rounded-full text-center inline-block w-4 h-4 flex items-center justify-center">
-                      {modifier.quantity}
-                    </span>
-                    {modifier.modifierItemName}
-                  </span>
-                  <h2>${modifier.modifierPrice}</h2>
-                </div>
-              ))}
-            </div>
-          ))}
-
-        <div className="py-3 flex flex-col gap-2">
-          <div className="flex justify-between ">
-            <p>Items</p>
-            <p>${calculateSubtotal().toFixed(2)}</p>
-          </div>
-          <div className="flex justify-between">
-            <p>Subtotal</p>
-            <p>${calculateSubtotal().toFixed(2)}</p>
-          </div>
-          {/* only show fees if there are items */}
-          {cartItems?.length > 0 && (
-            <>
-              {orderType === "delivery" && (
-                <div className="flex justify-between">
-                  <p>Delivery Fee</p>
-                  <p>${deliveryFee}</p>
-                </div>
-              )}
-
-              {charges?.map((data, index) => (
-                <div className="flex justify-between" key={index}>
-                  <p>
-                    {data.name} (
-                    {data.chargesType && (
-                      <span className="text-sm text-gray-500">
-                        {data.chargesType === "DISCOUNT" && "Discount"}
-                        {data.chargesType === "SERVICE" && "Service Charge"}
-                        {data.chargesType === "TAXES" && "Tax"}
-                      </span>
-                    )}
-                    )
-                  </p>
-                  <p>${calculateChargeAmount(data).toFixed(2)}</p>
-                </div>
-              ))}
-            </>
-          )}
-          <div className="flex justify-between font-bold">
-            <p>Total</p>
-            <p>${totalCartValue.toFixed(2)}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};

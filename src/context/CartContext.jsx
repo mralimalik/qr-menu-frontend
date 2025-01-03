@@ -96,7 +96,7 @@ export const CartContextProvider = ({ children }) => {
   };
 
   // Function to map cart data to backend format
-  const transformCartToOrder = (cart, tableName, customerInfo) => {
+  const transformCartToOrder = (cart, tableName, customerInfo,paymentMethod) => {
     const type = localStorage.getItem("orderType");
     const orderType = type === "delivery" ? "DELIVERY" : "DINEIN";
 
@@ -121,7 +121,7 @@ export const CartContextProvider = ({ children }) => {
     return {
       menuId:menuId,
       orderType: orderType,
-      paymentMethod: "CASH",
+      paymentMethod: paymentMethod || "CASH",
       orderSummary: orderSummary,
       customerInfo: customerInfo,
       tableName: tableName,
@@ -226,13 +226,24 @@ export const CartContextProvider = ({ children }) => {
 
 
   // create order function
-  const createOrder = async (venue, tableName, customerInfo,) => {
+  const createOrder = async (venue, tableName, customerInfo,paymentMethod,totalCartValue,cardDetails) => {
     try {
-      const orderData = transformCartToOrder(
+      const cashdata = transformCartToOrder(
         cartItems,
         tableName,
-        customerInfo
+        customerInfo,
+        paymentMethod
       );
+
+      const cardOrderData= {
+        ...cashdata,
+        totalCartValue: totalCartValue,
+        cardDetails: cardDetails,
+      }
+
+      const orderData = paymentMethod === "CASH" ? cashdata : cardOrderData;
+
+
 
       const url = `${apiurl}order/createOrder/${venue}`;
 

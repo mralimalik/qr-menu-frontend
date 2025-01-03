@@ -9,7 +9,7 @@ export const VenueContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
 
   // get venueId from params
-  const { venueId } = useParams();
+  const { venueId,menuId} = useParams();
   // using location to check in params
   const location = useLocation();
 
@@ -77,7 +77,7 @@ export const VenueContextProvider = ({ children }) => {
       const response = await axios.get(`${apiurl}menu/qr/${venueId}/${menuId}`);
 
       // Handle the response after successfully creating a venue
-      if (response.data) {
+      if (response.status===200) {
         setSelectedMenu(response.data.data);
       }
     } catch (err) {
@@ -161,6 +161,8 @@ export const VenueContextProvider = ({ children }) => {
     console.log("run second");
     fetchVenueData();
   }, []);
+  
+  
 
   useEffect(() => {
     const venue = localStorage.getItem("venue");
@@ -171,6 +173,12 @@ export const VenueContextProvider = ({ children }) => {
     }
   }, []);
 
+  useEffect(() => {
+   if(menuId){
+    getSelectedMenuData(venueId, menuId);
+   }
+  }, [menuId])
+  
   return (
     <VenueContext.Provider
       value={{
