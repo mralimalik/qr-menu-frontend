@@ -286,14 +286,13 @@ export const CartContextProvider = ({ children }) => {
         if (paymentMethod === "CARD") {
           window.location.href = paymentResponse.transactionUrl;
         } else {
+          // Replace the route
+          const orderId = response.data.order._id;
+          navigate(`/${venueId}/menu/${menuId}/order-summary/${orderId}`, {
+            replace: true,
+          });
           toast.success("Order Created Successfully");
         }
-
-        // Replace the route
-        // const orderId = response.data.order._id;
-        // navigate(`/${venueId}/menu/${menuId}/order-summary/${orderId}`, {
-        //   replace: true,
-        // });
       }
     } catch (e) {
       toast.error("Error creating order", e);
