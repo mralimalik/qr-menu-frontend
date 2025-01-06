@@ -295,7 +295,7 @@ export const CartContextProvider = ({ children }) => {
         }
       }
     } catch (e) {
-      toast.error("Error creating order", e);
+      // toast.error("Error creating order", e);
       console.log("error creating order ", e);
     }
   };
