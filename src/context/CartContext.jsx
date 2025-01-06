@@ -283,9 +283,11 @@ export const CartContextProvider = ({ children }) => {
           discount: 0,
           delivery: 0,
         });
-
-        window.location.href = paymentResponse.transactionUrl;
-        // toast.success("Order Created Successfully");
+        if (paymentMethod === "CARD") {
+          window.location.href = paymentResponse.transactionUrl;
+        } else {
+          toast.success("Order Created Successfully");
+        }
 
         // Replace the route
         // const orderId = response.data.order._id;
