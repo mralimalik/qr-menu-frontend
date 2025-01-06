@@ -10,8 +10,23 @@ import { CardPaymentSheet } from "../../component/CardPaymentSheet/CardPaymentSh
 import PaymentMethodSelector from "../../component/PaymentMethodSelector/PaymentMethodSelector";
 import { OrderSummary } from "../../component/CheckoutOrderSummary/OrderSummary.jsx";
 const Checkout = () => {
+  // to set total cart value
+  const [totalCartValue, setTotalCartValue] = useState(0);
+
+  // to show delivery fee
+  const [deliveryFee, setDeliveryFee] = useState(0);
+  // show loading when paying
+  const [loading, setLoading] = useState(false);
+  // to show card payment sheet
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  // to select payment method
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
+
+  // to navigate to other route
   const navigate = useNavigate();
+  // to get venue and menu id from params
   const { venueId, menuId } = useParams();
+
   const {
     cartItems,
     isCartButtonVisible,
@@ -29,11 +44,74 @@ const Checkout = () => {
     selectedMenu,
   } = useContext(VenueContext);
 
-  // to set total cart value
-  const [totalCartValue, setTotalCartValue] = useState(0);
+  // handle payment
+  const handleCheckout = async () => {
+    try {
+      setLoading(true);
+      if (cartItems && cartItems.length > 0 && venueId && menuId) {
+        if (selectedPaymentMethod === "CARD") {
+          setIsBottomSheetOpen(true);
+        } else if (selectedPaymentMethod === "CASH") {
+          await createOrder(
+            venueData._id,
+            tableData.tableName,
+            "",
+            selectedPaymentMethod,
+            totalCartValue,
+            {}
+          );
+        } else {
+          toast.error("Please select a payment method");
+        }
+      } else {
+        console.log("Cart is empty or missing venueId/menuId");
+      }
+    } catch (e) {
+      console.log("error creating order", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // to show delivery fee
-  const [deliveryFee, setDeliveryFee] = useState(0);
+  // // handle card payment
+  const handleCardPayment = async (cardDetails) => {
+    try {
+      setLoading(true);
+
+      await createOrder(
+        venueData._id,
+        tableData.tableName,
+        "",
+        selectedPaymentMethod,
+        totalCartValue,
+        cardDetails
+      );
+    } catch (error) {
+      console.error("Error processing payment:", error);
+      toast.error("Payment failed. Please try again.");
+    } finally {
+      setLoading(false);
+
+      setIsBottomSheetOpen(false);
+    }
+  };
+
+  const paymentOptions = [
+    {
+      value: "CASH",
+      label: "Pay with Cash",
+      enabled:
+        orderSettings?.settings.dineIn?.paymentEnabled &&
+        orderSettings?.settings.dineIn?.paymentOptions?.cashPayment,
+    },
+    {
+      value: "CARD",
+      label: "Pay with Card",
+      enabled:
+        orderSettings?.settings.dineIn?.paymentEnabled &&
+        orderSettings?.settings.dineIn?.paymentOptions?.cardPayment,
+    },
+  ];
 
   useEffect(() => {
     setDeliveryFee(calculateDeliveryFee(orderType, orderSettings));
@@ -49,75 +127,6 @@ const Checkout = () => {
       setTotalCartValue(0);
     }
   }, [cartItems, deliveryFee, charges, orderType]);
-
-  const [loading, setLoading] = useState(false);
-  const handleCheckout = async () => {
-    try {
-      setLoading(true);
-      if (cartItems && cartItems.length > 0 && venueId && menuId) {
-        if (selectedPaymentMethod === "CARD") {
-          setIsBottomSheetOpen(true);
-        } else if (selectedPaymentMethod === "CASH") {
-          createOrder(
-            venueData._id,
-            tableData.tableName,
-            "",
-            selectedPaymentMethod,
-            totalCartValue,
-            {}
-          );
-          navigate(`/${venueId}/menu/${menuId}/checkout`);
-        } else {
-          toast.error("Please select a payment method");
-        }
-      } else {
-        console.log("Cart is empty or missing venueId/menuId");
-      }
-      setLoading(false);
-    } catch (e) {
-      console.log("error creating order", e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
-
-  const handleCardPayment = async (cardDetails) => {
-    try {
-     
-        createOrder(
-          venueData._id,
-          tableData.tableName,
-          "",
-          selectedPaymentMethod,
-          totalCartValue,
-          cardDetails
-        );
-        navigate(`/${venueId}/menu/${menuId}/checkout`);
-      
-    } catch (error) {
-      console.error("Error processing payment:", error);
-      toast.error("Payment failed. Please try again.");
-    } finally {
-      setIsBottomSheetOpen(false);
-    }
-  };
-
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("");
-
-  const paymentOptions = [
-    {
-      value: "CASH",
-      label: "Pay with Cash",
-      enabled: orderSettings?.paymentOptions?.cashPayment,
-    },
-    {
-      value: "CARD",
-      label: "Pay with Card",
-      enabled: orderSettings?.paymentOptions?.cardPayment,
-    },
-  ];
 
   return (
     <div className="bg-slate-100">
@@ -151,9 +160,11 @@ const Checkout = () => {
       ) && (
         <div
           className="px-4 py-2 bg-white fixed bottom-0 w-full cursor-pointer"
-          onClick={handleCheckout}
+          // onClick={handleCheckout}
         >
           <button
+            onClick={!loading ? handleCheckout : undefined}
+            disabled={loading}
             className={`${
               cartItems?.length === 0 ? "bg-purple-200" : "bg-purple-500"
             } text-white sm:w-[380px] w-full py-2 rounded-lg font-semibold`}
@@ -171,6 +182,7 @@ const Checkout = () => {
         handleCardPayment={handleCardPayment}
         isOpen={isBottomSheetOpen}
         onDismiss={() => setIsBottomSheetOpen(false)}
+        loading={loading}
       />
       <ToastContainer />
     </div>

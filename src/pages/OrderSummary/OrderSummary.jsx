@@ -39,8 +39,13 @@ const OrderSummary = () => {
     if (orderData?.orderSummary) {
       const itemsTotal = orderData.orderSummary.reduce((total, item) => {
         return (
-          total + item.itemPrice * item.quantity + item.modifiers?.reduce((modifierTotal, modifier) => {
-            return modifierTotal + modifier.modifierPrice * modifier.quantity * item.quantity;
+          total +
+          item.itemPrice * item.quantity +
+          item.modifiers?.reduce((modifierTotal, modifier) => {
+            return (
+              modifierTotal +
+              modifier.modifierPrice * modifier.quantity * item.quantity
+            );
           }, 0)
         );
       }, 0);
@@ -72,7 +77,14 @@ const OrderSummary = () => {
   const handleMenuNavigation = () => {
     navigate(`/${venueId}/menu/${menuId}`, { replace: true });
   };
-
+  const showPaymentMethod = (orderData) => {
+    switch (orderData?.paymentMethod) {
+      case "CARD":
+        return "Card";
+      default:
+        return "Cash";
+    }
+  };
   return (
     <div className="w-full mb-3">
       <div className="h-[300px] bg-violet-400 flex flex-col justify-center px-3 w-full">
@@ -126,7 +138,7 @@ const OrderSummary = () => {
 
       <div className=" m-3 p-4 bg-white rounded-lg shadow-lg">
         <h3 className="font-semibold">
-          Payment Method: <span className="font-normal">Cash</span>
+          Payment Method: <span className="font-normal">{showPaymentMethod(orderData)}</span>
         </h3>
       </div>
       <div className=" m-4 p-4 bg-white rounded-lg shadow-md">

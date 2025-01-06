@@ -38,7 +38,7 @@ export const CartContextProvider = ({ children }) => {
     const addedItem = {
       itemId: itemData._id,
       menuId: itemData.menuId,
-      sectionId:itemData.parentId,
+      sectionId: itemData.parentId,
       itemPriceName: itemData.price[0].name,
       itemName: itemData.itemName,
       addOnPrices: 0,
@@ -96,22 +96,27 @@ export const CartContextProvider = ({ children }) => {
   };
 
   // Function to map cart data to backend format
-  const transformCartToOrder = (cart, tableName, customerInfo,paymentMethod) => {
+  const transformCartToOrder = (
+    cart,
+    tableName,
+    customerInfo,
+    paymentMethod
+  ) => {
     const type = localStorage.getItem("orderType");
     const orderType = type === "delivery" ? "DELIVERY" : "DINEIN";
 
     const orderSummary = cart.map((item) => {
       return {
-        itemId:item.itemId,
-        sectionId:item.sectionId,
+        itemId: item.itemId,
+        sectionId: item.sectionId,
         itemName: item.itemName,
-        itemSizeName: item.itemPriceName || "Regular", 
+        itemSizeName: item.itemPriceName || "Regular",
         itemPrice: item.itemPrice,
         quantity: item.totalQuantity,
         modifiers: item.modifiers.map((modifier) => ({
-          modifierGroupId:modifier.modifierId,
-          modifierPriceId:modifier.modifierPriceId,
-          modifierName: modifier.modifierItemName || '',
+          modifierGroupId: modifier.modifierId,
+          modifierPriceId: modifier.modifierPriceId,
+          modifierName: modifier.modifierItemName || "",
           modifierPrice: modifier.modifierPrice || 0,
           quantity: modifier.quantity,
         })),
@@ -119,7 +124,7 @@ export const CartContextProvider = ({ children }) => {
     });
 
     return {
-      menuId:menuId,
+      menuId: menuId,
       orderType: orderType,
       paymentMethod: paymentMethod || "CASH",
       orderSummary: orderSummary,
@@ -180,7 +185,7 @@ export const CartContextProvider = ({ children }) => {
     return tax + serviceCharge;
   };
 
-  //calculate discount 
+  //calculate discount
   const calculateDiscount = (subtotal, charges) => {
     let discount = 0;
 
@@ -224,9 +229,15 @@ export const CartContextProvider = ({ children }) => {
     return subtotal - discount + delivery + additionalCharges;
   };
 
-
   // create order function
-  const createOrder = async (venue, tableName, customerInfo,paymentMethod,totalCartValue,cardDetails) => {
+  const createOrder = async (
+    venue,
+    tableName,
+    customerInfo,
+    paymentMethod,
+    totalCartValue,
+    cardDetails
+  ) => {
     try {
       const cashdata = transformCartToOrder(
         cartItems,
@@ -235,15 +246,29 @@ export const CartContextProvider = ({ children }) => {
         paymentMethod
       );
 
-      const cardOrderData= {
-        ...cashdata,
-        totalCartValue: totalCartValue,
-        cardDetails: cardDetails,
+      // Only process card payment if payment method is card
+      let orderData = cashdata;
+      let paymentResponse = null;
+
+      if (paymentMethod === "CARD") {
+        paymentResponse = await processCardPaymentOrder(
+          totalCartValue,
+          cardDetails
+        );
+
+        if (!paymentResponse.success) {
+          // Handle failed card payment before proceeding
+          toast.error("Payment failed, please try again.");
+          return;
+        }
+
+        orderData = {
+          ...cashdata,
+          paymentId: paymentResponse.paymentId, // Add paymentId if payment is successful
+        };
       }
-
-      const orderData = paymentMethod === "CASH" ? cashdata : cardOrderData;
-
-
+      // if payment method is cash then don't add card details data, hence no payment function will run
+      // const orderData = paymentMethod === "CASH" ? cashdata : cardOrderData;
 
       const url = `${apiurl}order/createOrder/${venue}`;
 
@@ -258,17 +283,81 @@ export const CartContextProvider = ({ children }) => {
           discount: 0,
           delivery: 0,
         });
-        toast.success("Order Created Successfully");
+
+        window.location.href = paymentResponse.transactionUrl;
+        // toast.success("Order Created Successfully");
 
         // Replace the route
-        const orderId = response.data.order._id;
-        navigate(`/${venueId}/menu/${menuId}/order-summary/${orderId}`, {
-          replace: true,
-        });
+        // const orderId = response.data.order._id;
+        // navigate(`/${venueId}/menu/${menuId}/order-summary/${orderId}`, {
+        //   replace: true,
+        // });
       }
     } catch (e) {
-      toast.error("Error creating order");
+      toast.error("Error creating order", e);
       console.log("error creating order ", e);
+    }
+  };
+
+  const moyassarKey = () => {
+    const apiKey = `${"sk_test_Xe4zfnzZHmD5opcKTng35ZWgF8zSPSiScL2Y6A4R"}`;
+
+    const username = apiKey;
+    const password = "";
+
+    const credentials = `${username}:${password}`;
+    return btoa(credentials);
+  };
+
+  // initiate payment
+  const processCardPaymentOrder = async (totalCartValue, cardDetails) => {
+    try {
+      const convertedAmount = Math.round(totalCartValue * 100);
+      const encodedCredentials = moyassarKey();
+
+      // Process the payment using the token
+      const response = await axios.post(
+        "https://api.moyasar.com/v1/payments",
+        {
+          amount: convertedAmount,
+          currency: "USD",
+          callback_url: `https://qr-menu-frontend-beryl.vercel.app/${venueId}/menu/${menuId}/payment-status`,
+          description: "Payment for order #",
+          source: {
+            type: "card",
+            name: cardDetails.name,
+            number: cardDetails.number.replace(/\s+/g, ""),
+            month: cardDetails.exp_month,
+            year: cardDetails.exp_year,
+            cvc: cardDetails.cvc,
+          },
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${encodedCredentials}`,
+          },
+        }
+      );
+      console.log("payment", response.data);
+
+      // Check if the payment was successful
+      if (response.status === 201) {
+        console.log("Payment Success");
+        const transactionUrl = response.data.source.transaction_url;
+        // window.location.href = transactionUrl;
+        return { success: true, paymentId: response.data.id, transactionUrl };
+      }
+
+      console.error("Payment failed:", response);
+      return { success: false };
+    } catch (error) {
+      if (error.response) {
+        console.error("API Response Error:", error.response.data);
+      } else {
+        console.error("Request Error:", error.message);
+      }
+      return { success: false, error: error.message };
     }
   };
 
@@ -312,6 +401,8 @@ export const CartContextProvider = ({ children }) => {
         createOrder,
         getOrder,
         orderData,
+        processCardPaymentOrder,
+        moyassarKey,
       }}
     >
       {children}

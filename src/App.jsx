@@ -7,6 +7,7 @@ import Cart from "./pages/CartPage/Cart.jsx";
 import Checkout from "./pages/Checkout/Checkout.jsx";
 import OrderSummary from "./pages/OrderSummary/OrderSummary.jsx";
 import OrderStatus from "./pages/OrderStatus/OrderStatus.jsx";
+import PaymentStatusPage from "./pages/PaymentStatusPage/PaymentStatusPage.jsx";
 function App() {
   return (
     <Router>
@@ -31,6 +32,8 @@ function App() {
           <Route path="menu/:menuId" element={<MenuHome />} />
           <Route path="menu/:menuId/cart" element={<Cart />} />
           <Route path="menu/:menuId/checkout" element={<Checkout />} />
+          <Route path="menu/:menuId/payment-status" element={<PaymentStatusPage />} />
+
           <Route
             path="menu/:menuId/order-summary/:orderId"
             element={<OrderSummary />}

@@ -34,7 +34,7 @@ const OrderStatus = () => {
     if (inputOrderId && inputOrderId !== orderId) {
       setOrderId(inputOrderId);
     } else if (inputOrderId === orderId) {
-   await   getOrderDetails();
+      await getOrderDetails();
     }
   };
 
@@ -113,8 +113,13 @@ const OrderStatus = () => {
               <OrderTimeline status={"Cancelled"} isActive={true} />
             )}
 
+            {orderData?.status === "REFUNDED" && (
+              <OrderTimeline status={"Refunded"} isActive={true} />
+            )}
+
             {/* Other Status Items */}
             {orderData?.status !== "CANCELLED" &&
+              orderData?.status !== "REFUNDED" &&
               dineInTimeline.map((status, index) => {
                 const isActive =
                   index <=
