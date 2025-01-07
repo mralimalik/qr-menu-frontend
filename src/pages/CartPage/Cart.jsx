@@ -2,23 +2,21 @@ import React, { useEffect, useState } from "react";
 import { useContext } from "react";
 import { CartContext } from "../../context/CartContext";
 import { VenueContext } from "../../context/VenueContext";
-import { useNavigate,useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 const Cart = () => {
   const navigate = useNavigate();
-  const {venueId,menuId} = useParams();
+  const { venueId, menuId } = useParams();
   const {
     cartItems,
     setCartItems,
     isCartButtonVisible,
-    appliedCharges,
-    setAppliedCharges,
+    calculateDeliveryFee,
+    calculateSubtotal,
+    calculateTotalCartValue,
   } = useContext(CartContext);
 
-  
-
-  const { charges, orderSettings, orderType, tableData ,selectedMenu} =
+  const { charges, orderSettings, orderType, tableData, selectedMenu } =
     useContext(VenueContext);
-
 
   // to set total cart value
   const [totalCartValue, setTotalCartValue] = useState(0);
@@ -79,6 +77,7 @@ const Cart = () => {
     });
   };
 
+  // delete item from cart
   const handleDeleteItem = (itemIndexToDelete) => {
     setCartItems((currentCartItems) =>
       currentCartItems.filter(
@@ -87,16 +86,17 @@ const Cart = () => {
     );
   };
 
-  const calculateDeliveryFee = () => {
-    return orderType === "delivery" &&
-      orderSettings?.settings?.delivery?.deliveryFee
-      ? orderSettings.settings.delivery.deliveryFee
-      : 0;
-  };
-
-  const calculateSubtotal = () => {
-    return cartItems?.reduce((total, item) => total + item.totalPrice, 0) || 0;
-  };
+  // // calculate the delivery fee
+  // const calculateDeliveryFee = () => {
+  //   return orderType === "delivery" &&
+  //     orderSettings?.settings?.delivery?.deliveryFee
+  //     ? orderSettings.settings.delivery.deliveryFee
+  //     : 0;
+  // };
+  // calculate the total of items
+  // const calculateSubtotal = () => {
+  //   return cartItems?.reduce((total, item) => total + item.totalPrice, 0) || 0;
+  // };
 
   // // Function to calculate additional charges like taxes, service
   // const calculateAdditionalCharges = (subtotal) => {
@@ -130,99 +130,87 @@ const Cart = () => {
   //     return totalDiscount; // Ignore other charge types
   //   }, 0);
   // };
+  // const calculateAdditionalCharges = (subtotal) => {
+  //   let tax = 0;
+  //   let serviceCharge = 0;
 
-  const calculateAdditionalCharges = (subtotal) => {
-    let tax = 0;
-    let serviceCharge = 0;
+  //   if (charges) {
+  //     charges.forEach((charge) => {
+  //       if (
+  //         charge.chargesType === "SERVICE" ||
+  //         charge.chargesType === "TAXES"
+  //       ) {
+  //         if (charge.amountType === "PERCENT") {
+  //           const amount = (subtotal * charge.amount) / 100;
+  //           if (charge.chargesType === "TAXES") {
+  //             tax += amount;
+  //           } else {
+  //             serviceCharge += amount;
+  //           }
+  //         } else {
+  //           const amount = charge.amount;
+  //           if (charge.chargesType === "TAXES") {
+  //             tax += amount;
+  //           } else {
+  //             serviceCharge += amount;
+  //           }
+  //         }
+  //       }
+  //     });
+  //   }
 
-    if (charges) {
-      charges.forEach((charge) => {
-        if (
-          charge.chargesType === "SERVICE" ||
-          charge.chargesType === "TAXES"
-        ) {
-          if (charge.amountType === "PERCENT") {
-            const amount = (subtotal * charge.amount) / 100;
-            if (charge.chargesType === "TAXES") {
-              tax += amount;
-            } else {
-              serviceCharge += amount;
-            }
-          } else {
-            const amount = charge.amount;
-            if (charge.chargesType === "TAXES") {
-              tax += amount;
-            } else {
-              serviceCharge += amount;
-            }
-          }
-        }
-      });
-    }
+  //   // Update applied charges state
+  //   setAppliedCharges((prev) => ({
+  //     ...prev,
+  //     tax,
+  //     serviceCharge,
+  //   }));
 
-    // Update applied charges state
-    setAppliedCharges((prev) => ({
-      ...prev,
-      tax,
-      serviceCharge,
-    }));
+  //   return tax + serviceCharge;
+  // };
 
-    return tax + serviceCharge;
-  };
+  // // calculate the discount on overall total
+  // const calculateDiscount = (subtotal) => {
+  //   let discount = 0;
 
-  const calculateDiscount = (subtotal) => {
-    let discount = 0;
+  //   if (charges) {
+  //     charges.forEach((charge) => {
+  //       if (charge.chargesType === "DISCOUNT") {
+  //         if (charge.amountType === "PERCENT") {
+  //           discount += (subtotal * charge.amount) / 100;
+  //         } else {
+  //           discount += charge.amount;
+  //         }
+  //       }
+  //     });
+  //   }
 
-    if (charges) {
-      charges.forEach((charge) => {
-        if (charge.chargesType === "DISCOUNT") {
-          if (charge.amountType === "PERCENT") {
-            discount += (subtotal * charge.amount) / 100;
-          } else {
-            discount += charge.amount;
-          }
-        }
-      });
-    }
+  //   // Update applied charges state
+  //   setAppliedCharges((prev) => ({
+  //     ...prev,
+  //     discount,
+  //   }));
 
-    // Update applied charges state
-    setAppliedCharges((prev) => ({
-      ...prev,
-      discount,
-    }));
-
-    return discount;
-  };
+  //   return discount;
+  // };
 
   // Function to calculate the total cart value
-  const calculateTotalCartValue = () => {
-    const subtotal = calculateSubtotal();
-    const discount = calculateDiscount(subtotal); // Calculate discount
-    const delivery = calculateDeliveryFee();
-    const additionalCharges = calculateAdditionalCharges(subtotal - discount); // Apply additional charges after discount
+  // const calculateTotalCartValue = () => {
+  //   const subtotal = calculateSubtotal();
+  //   const discount = calculateDiscount(subtotal,charges); // Calculate discount
+  //   const delivery = calculateDeliveryFee();
+  //   const additionalCharges = calculateAdditionalCharges(subtotal - discount,charges); // Apply additional charges after discount
 
-    // Update applied charges map using spread operator to update specific fields
-    setAppliedCharges((prevCharges) => ({
-      ...prevCharges,
-      delivery: delivery,
-    }));
+  //   // Update applied charges map using spread operator to update specific fields
+  //   setAppliedCharges((prevCharges) => ({
+  //     ...prevCharges,
+  //     delivery: delivery,
+  //   }));
 
-    return subtotal - discount + delivery + additionalCharges;
-  };
+  //   return subtotal - discount + delivery + additionalCharges;
+  // };
 
-  useEffect(() => {
-    setDeliveryFee(calculateDeliveryFee());
-  }, [orderSettings, orderType]);
-
-  useEffect(() => {
-    if (cartItems?.length > 0) {
-      setTotalCartValue(calculateTotalCartValue());
-      console.log("Cart items", cartItems);
-    } else {
-      setTotalCartValue(0);
-    }
-  }, [cartItems, deliveryFee, charges, orderType]);
-
+  // handle checkout button tap
   const handleCheckout = () => {
     if (cartItems && cartItems.length > 0 && venueId && menuId) {
       navigate(`/${venueId}/menu/${menuId}/checkout`);
@@ -230,7 +218,19 @@ const Cart = () => {
       console.log("Cart is empty or missing venueId/menuId");
     }
   };
-  
+
+  useEffect(() => {
+    setDeliveryFee(calculateDeliveryFee(orderType,orderSettings));
+  }, [orderSettings, orderType]);
+
+  useEffect(() => {
+    if (cartItems?.length > 0) {
+      setTotalCartValue(calculateTotalCartValue(charges,orderType,orderSettings));
+      console.log("Cart items", cartItems);
+    } else {
+      setTotalCartValue(0);
+    }
+  }, [cartItems, deliveryFee, charges, orderType]);
 
   return (
     <div className="bg-slate-100">
@@ -347,9 +347,20 @@ const Cart = () => {
           </div>
         </div>
       </div>
-      {isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
-        <div className="px-2 py-2 bg-white fixed bottom-0 w-full cursor-pointer" onClick={handleCheckout}>
-          <button className={`${cartItems?.length===0?"bg-purple-200":"bg-purple-500"} text-white sm:w-[380px] w-full  py-2 rounded-lg font-semibold`}>
+      {isCartButtonVisible(
+        orderType,
+        orderSettings,
+        selectedMenu?.orderSettings
+      ) && (
+        <div
+          className="px-2 py-2 bg-white fixed bottom-0 w-full cursor-pointer"
+          onClick={handleCheckout}
+        >
+          <button
+            className={`${
+              cartItems?.length === 0 ? "bg-purple-200" : "bg-purple-500"
+            } text-white sm:w-[380px] w-full  py-2 rounded-lg font-semibold`}
+          >
             Checkout (${totalCartValue.toFixed(2)})
           </button>
         </div>

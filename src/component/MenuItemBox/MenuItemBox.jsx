@@ -4,9 +4,9 @@ import { VenueContext } from "../../context/VenueContext.jsx";
 import { useNavigate, useParams } from "react-router-dom";
 import { CartContext } from "../../context/CartContext.jsx";
 const MenuItemBox = ({ item }) => {
-  const { orderSettings, tableData, orderType,selectedMenu } = useContext(VenueContext);
+  const { orderSettings, orderType,selectedMenu } = useContext(VenueContext);
   const { venueId, menuId } = useParams(); // Get the venueId from the route parameters
-  const { calculateTotalCartPrice, addItemToCart, isCartButtonVisible } =
+  const {addItemToCart, isCartButtonVisible } =
     useContext(CartContext);
 
   const navigate = useNavigate();

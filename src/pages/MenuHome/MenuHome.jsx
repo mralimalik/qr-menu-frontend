@@ -25,7 +25,7 @@ const MenuHome = () => {
     setLoading,
   } = useContext(VenueContext);
   const {
-    calculateTotalCartPrice,
+    calculateSubtotal,
     addItemToCart,
     isCartButtonVisible,
     cartItems,
@@ -135,7 +135,7 @@ const MenuHome = () => {
               className="bg-violet-400 py-[8px] text-white flex justify-center items-center font-medium  text-lg cursor-pointer sm:w-[380px] w-full rounded-lg"
               onClick={handleViewCartClick}
             >
-              <h4>View Cart ${calculateTotalCartPrice()}</h4>
+              <h4>View Cart ${calculateSubtotal()}</h4>
             </div>
           </div>
         )}

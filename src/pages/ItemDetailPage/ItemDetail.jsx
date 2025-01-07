@@ -13,8 +13,10 @@ import LoadingIndicator from "../../component/LoadingIndicator/LoadingIndicator.
 const ItemDetail = ({}) => {
   const { itemId } = useParams();
 
-  const { orderSettings, tableData, orderType,selectedMenu } = useContext(VenueContext);
-  const { storeItemsInCartandLocal,isCartButtonVisible } = useContext(CartContext);
+  const { orderSettings, tableData, orderType, selectedMenu } =
+    useContext(VenueContext);
+  const { storeItemsInCartandLocal, isCartButtonVisible } =
+    useContext(CartContext);
 
   const [loading, setLoading] = useState(false);
   // to store current item data
@@ -69,30 +71,17 @@ const ItemDetail = ({}) => {
     }
   };
 
-  useEffect(() => {
-    fetchModifiers();
-  }, []);
-
-  // setting default price value
-  useEffect(() => {
-    if (itemData) {
-      setSelectedPrice(itemData.price[0].price);
-    }
-  }, [itemData]);
-
-  // calculating total item value based on these
-  useEffect(() => {
-    calculateTotalItemPrice();
-  }, [quantity, modifierQuantity, selectedPrice]);
-
+  // handle item quantity increment
   const handleAddCartItemQuantity = () => {
     setQuantity((prev) => prev + 1); // Increment quantity
   };
 
+  // handle item quantity decrement
   const handleDecreaseCartItemQuantity = () => {
     setQuantity((prev) => (prev > 0 ? prev - 1 : 0)); // Decrement, but prevent going below 0
   };
 
+  // handle adding item modifiers
   const addModifiers = (
     modifierGroupId,
     modifierPriceId,
@@ -232,6 +221,21 @@ const ItemDetail = ({}) => {
     }
   };
 
+  useEffect(() => {
+    fetchModifiers();
+  }, []);
+
+  // setting default price value
+  useEffect(() => {
+    if (itemData) {
+      setSelectedPrice(itemData.price[0].price);
+    }
+  }, [itemData]);
+
+  // calculating total item value based on these
+  useEffect(() => {
+    calculateTotalItemPrice();
+  }, [quantity, modifierQuantity, selectedPrice]);
   return (
     <div className="bg-white flex justify-start ">
       <div className="main-div h-screen   overflow-y-auto  relative overflow-hidden sm:w-[410px] w-full">
@@ -379,7 +383,11 @@ const ItemDetail = ({}) => {
           )}
 
           {/* add to cart button */}
-          { isCartButtonVisible(orderType, orderSettings,selectedMenu?.orderSettings) && (
+          {isCartButtonVisible(
+            orderType,
+            orderSettings,
+            selectedMenu?.orderSettings
+          ) && (
             <div className="fixed bottom-0 py-2  sm:w-[410px] w-full left-0 px-3 bg-white ">
               <div className="flex justify-between items-center gap-2">
                 <div className="flex gap-2 items-center justify-center">

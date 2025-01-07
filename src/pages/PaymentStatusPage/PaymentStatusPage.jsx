@@ -6,17 +6,26 @@ import { CartContext } from "../../context/CartContext";
 import { apiurl } from "../../constants/apiconst.js";
 import { toast } from "react-toastify";
 const PaymentStatusPage = () => {
+  // get the moyassar key
   const { moyassarKey } = useContext(CartContext);
-  const location = useLocation();
+
+  // store payment data
   const [paymentData, setPaymentData] = useState(null);
+  // loading and error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // get venue menu from params,
   const { venueId, menuId } = useParams();
+  //  location for link
+  const location = useLocation();
+  // for navigation
   const navigate = useNavigate();
+
   // Extract query parameters from location.search
   const urlParams = new URLSearchParams(location.search);
   const id = urlParams.get("id");
 
+  // update the payment status in backend order
   const updatePaymentStatus = async (paymentId, status) => {
     try {
       const response = await axios.put(
@@ -34,6 +43,7 @@ const PaymentStatusPage = () => {
     }
   };
 
+  // get the status of payment from moyassar api 
   const getPaymentStatusFromMoyassar = async () => {
     try {
       const apiKey = moyassarKey();
@@ -47,6 +57,7 @@ const PaymentStatusPage = () => {
       );
 
       const status = response.data.status;
+      
 
       if (status !== "paid") {
         toast.success("Order created successfully");

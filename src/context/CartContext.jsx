@@ -7,9 +7,11 @@ import { apiurl } from "../constants/apiconst.js";
 export const CartContext = createContext();
 
 export const CartContextProvider = ({ children }) => {
+  // get venue, menu from params
   const { venueId, menuId } = useParams();
   const navigate = useNavigate();
 
+  // get and store cart items
   const [cartItems, setCartItems] = useState(() => {
     const savedCartItems = localStorage.getItem("cartItems");
     return savedCartItems ? JSON.parse(savedCartItems) : [];
@@ -23,15 +25,14 @@ export const CartContextProvider = ({ children }) => {
     delivery: 0,
   });
 
+  // to store the order data
   const [orderData, setOrderData] = useState(null);
 
+  // to store items in cart
   const storeItemsInCartandLocal = (itemData) => {
     setCartItems((prev) => [...prev, itemData]);
   };
 
-  const calculateTotalCartPrice = () => {
-    return cartItems.reduce((total, item) => total + (item.totalPrice || 0), 0);
-  };
 
   // add item to cart from home
   const addItemToCart = (itemData) => {
@@ -134,6 +135,7 @@ export const CartContextProvider = ({ children }) => {
     };
   };
 
+  // to calculate delivery fee
   const calculateDeliveryFee = (orderType, orderSettings) => {
     return orderType === "delivery" &&
       orderSettings?.settings?.delivery?.deliveryFee
@@ -141,6 +143,7 @@ export const CartContextProvider = ({ children }) => {
       : 0;
   };
 
+  // to calculate sub total
   const calculateSubtotal = () => {
     return cartItems?.reduce((total, item) => total + item.totalPrice, 0) || 0;
   };
@@ -267,8 +270,7 @@ export const CartContextProvider = ({ children }) => {
           paymentId: paymentResponse.paymentId, // Add paymentId if payment is successful
         };
       }
-      // if payment method is cash then don't add card details data, hence no payment function will run
-      // const orderData = paymentMethod === "CASH" ? cashdata : cardOrderData;
+     
 
       const url = `${apiurl}order/createOrder/${venue}`;
 
@@ -391,7 +393,6 @@ export const CartContextProvider = ({ children }) => {
         cartItems,
         setCartItems,
         storeItemsInCartandLocal,
-        calculateTotalCartPrice,
         addItemToCart,
         isCartButtonVisible,
         appliedCharges,
@@ -404,6 +405,9 @@ export const CartContextProvider = ({ children }) => {
         orderData,
         processCardPaymentOrder,
         moyassarKey,
+        calculateDiscount,
+        calculateAdditionalCharges
+        
       }}
     >
       {children}
